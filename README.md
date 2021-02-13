@@ -1,2 +1,7 @@
-# scripts
-Repository to hold all my scripts
+# Scripts
+
+Repository to hold all my helper scripts
+
+## Helm
+
+- `set-version.sh`
