@@ -35,12 +35,19 @@ done
 
 if [[ ${#args[@]} -eq 0 ]]; then
   echo "Usage: $0 [default|full|dev|services|cloud|<tool> [tool ...]] [--dry-run]"
+  echo "Bundled install options:"
+  echo "  default  = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode"
+  echo "  full/dev = default + gcloud, awscli, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq"
+  echo "  services = postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka"
+  echo "  cloud    = gcloud, awscli, eksctl, az, doctl, jq, yq"
+  echo "Direct tool options include: git, curl, wget, unzip, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode, gcloud, aws, awscli, eksctl, az, azure, doctl, digitalocean, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka"
   echo "Examples:"
   echo "  $0 default"
   echo "  $0 full"
   echo "  $0 services"
   echo "  $0 cloud"
   echo "  $0 git nvm kubectl helm docker"
+  echo "  $0 gcloud awscli eksctl az doctl"
   exit 1
 fi
 

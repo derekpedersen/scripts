@@ -35,7 +35,10 @@ FULL_BUNDLE=(
   gcloud
   awscli
   eksctl
+  az
   doctl
+  jq
+  yq
   postgres
   redis
   mysql

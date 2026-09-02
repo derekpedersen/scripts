@@ -2,6 +2,81 @@
 # Docker cleanup helpers
 # ─────────────────────────────────────────────
 
+# Log in to a Docker registry
+# Usage:
+#   docker-login <registry>
+#   docker-login <registry> <username>
+#   docker-login <registry> <username> <password>
+docker-login() {
+    local registry="${1:-}"
+    local username="${2:-}"
+    local password="${3:-}"
+
+    if [[ -z "$registry" ]]; then
+        echo "Usage: docker-login <registry> [username] [password]"
+        echo "Examples:"
+        echo "  docker-login ghcr.io"
+        echo "  docker-login registry.example.com myuser"
+        echo "  docker-login registry.example.com myuser mypass"
+        return 1
+    fi
+
+    if [[ -n "$username" && -n "$password" ]]; then
+        printf '%s' "$password" | docker login "$registry" --username "$username" --password-stdin
+        return
+    fi
+
+    if [[ -n "$username" ]]; then
+        docker login "$registry" --username "$username"
+        return
+    fi
+
+    docker login "$registry"
+}
+
+# Log out of a Docker registry
+# Usage:
+#   docker-logout
+#   docker-logout <registry>
+docker-logout() {
+    if [[ -n "${1:-}" ]]; then
+        docker logout "$1"
+        return
+    fi
+
+    docker logout
+}
+
+# List running containers
+docker-ps() {
+    docker ps "$@"
+}
+
+# List all containers
+docker-psa() {
+    docker ps -a "$@"
+}
+
+# Follow container logs
+docker-logs() {
+    if [[ -z "${1:-}" ]]; then
+        echo "Usage: docker-logs <container>"
+        return 1
+    fi
+
+    docker logs -f "$@"
+}
+
+# Shell into a running container
+docker-shell() {
+    if [[ -z "${1:-}" ]]; then
+        echo "Usage: docker-shell <container>"
+        return 1
+    fi
+
+    docker exec -it "$1" /bin/sh
+}
+
 # Show Docker disk usage
 docker-clean-disk-usage() {
     docker system df
