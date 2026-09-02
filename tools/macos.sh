@@ -32,6 +32,21 @@ install_mac() {
         echo "Docker Desktop is typically installed via the official app, not Homebrew."
         echo "Install it from: https://www.docker.com/products/docker-desktop/"
         ;;
+      gcloud|google-cloud)
+        brew install --cask google-cloud-sdk
+        ;;
+      aws|awscli)
+        brew install awscli
+        ;;
+      eksctl)
+        brew install eksctl
+        ;;
+      az|azure|azure-cli)
+        brew install azure-cli
+        ;;
+      doctl|digitalocean|doks)
+        brew install doctl
+        ;;
       golang)
         brew install go
         ;;

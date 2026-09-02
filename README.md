@@ -16,9 +16,10 @@ Repository to hold all my helper scripts.
 Built-in bundle names:
 
 - `default` — core developer setup
-- `full` — default plus broader dev tools and common local services
+- `full` — default plus broader dev tools, cloud tooling, and common local services
 - `dev` — same as `full`
 - `services` — local database/service stack including MongoDB, RabbitMQ, Elasticsearch, and Kafka
+- `cloud` — AWS, GCP, Azure, and DigitalOcean CLI tooling plus JSON/YAML helpers
 
 Supported tool names:
 
@@ -29,6 +30,11 @@ Supported tool names:
 - `kubectl` / `kubernetes-cli`
 - `golang`
 - `docker`
+- `gcloud` / `google-cloud`
+- `aws` / `awscli`
+- `eksctl`
+- `az` / `azure` / `azure-cli`
+- `doctl` / `digitalocean` / `doks`
 - `dotnet` / `dotnetcore`
 - `vscode` / `code`
 - `curl`
@@ -51,6 +57,7 @@ bash ./tools/install.sh default
 bash ./tools/install.sh full
 bash ./tools/install.sh dev
 bash ./tools/install.sh services
+bash ./tools/install.sh cloud
 bash ./tools/install.sh git nvm node kubectl helm docker dotnetcore vscode
 ```
 

@@ -32,6 +32,10 @@ FULL_BUNDLE=(
   dotnetcore
   vscode
   code
+  gcloud
+  awscli
+  eksctl
+  doctl
   postgres
   redis
   mysql
@@ -49,6 +53,16 @@ SERVICES_BUNDLE=(
   rabbitmq
   elasticsearch
   kafka
+)
+
+CLOUD_BUNDLE=(
+  gcloud
+  awscli
+  eksctl
+  doctl
+  az
+  jq
+  yq
 )
 
 ensure_root_or_sudo() {

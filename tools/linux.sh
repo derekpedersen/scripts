@@ -151,6 +151,40 @@ install_linux() {
           fi
         fi
         ;;
+      gcloud|google-cloud)
+        if ! command -v gcloud >/dev/null 2>&1; then
+          install_pkg apt-transport-https ca-certificates gnupg curl
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | $SUDO tee /etc/apt/sources.list.d/google-cloud-sdk.list >/dev/null
+          $SUDO apt-get update
+          $SUDO apt-get install -y google-cloud-cli
+        fi
+        ;;
+      aws|awscli)
+        if ! command -v aws >/dev/null 2>&1; then
+          install_pkg unzip curl
+          $SUDO apt-get install -y awscli
+        fi
+        ;;
+      eksctl)
+        if ! command -v eksctl >/dev/null 2>&1; then
+          curl -fsSL "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" -o /tmp/eksctl.tar.gz
+          tar -xzf /tmp/eksctl.tar.gz -C /tmp
+          $SUDO install /tmp/eksctl /usr/local/bin/eksctl
+        fi
+        ;;
+      az|azure|azure-cli)
+        if ! command -v az >/dev/null 2>&1; then
+          curl -sL https://aka.ms/InstallAzureCLIDeb | $SUDO bash
+        fi
+        ;;
+      doctl|digitalocean|doks)
+        if ! command -v doctl >/dev/null 2>&1; then
+          curl -fsSL -o /tmp/doctl.tar.gz https://github.com/digitalocean/doctl/releases/download/v1.110.0/doctl-1.110.0-linux-amd64.tar.gz
+          tar -xzf /tmp/doctl.tar.gz -C /tmp
+          $SUDO install /tmp/doctl /usr/local/bin/doctl
+        fi
+        ;;
       curl)
         install_pkg curl
         ;;
