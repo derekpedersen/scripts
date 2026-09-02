@@ -19,6 +19,9 @@ install_mac() {
       git)
         brew install git
         ;;
+      gpg)
+        brew install gnupg
+        ;;
       helm)
         brew install helm
         ;;

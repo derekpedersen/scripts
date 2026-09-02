@@ -38,6 +38,9 @@ install_linux() {
       git)
         install_pkg git
         ;;
+      gpg)
+        install_pkg gnupg
+        ;;
       helm)
         install_pkg curl apt-transport-https gnupg
         if ! command -v helm >/dev/null 2>&1; then
