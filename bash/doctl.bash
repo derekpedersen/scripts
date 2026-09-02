@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
-# DigitalOcean CLI helpers.
+# ============================================================
+# DigitalOcean CLI helpers
+# ============================================================
+#
+# Purpose:
+#   Convenience commands for working with DigitalOcean resources,
+#   especially Kubernetes and droplets.
+#
+# Notes:
+#   Keep helpers small, predictable, and easy to type.
+# ============================================================
 
 do-current-account() {
   doctl account get

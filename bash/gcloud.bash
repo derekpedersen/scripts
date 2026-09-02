@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-# Google Cloud helpers.
+# ============================================================
+# Google Cloud helpers
+# ============================================================
+#
+# Purpose:
+#   Shortcuts for common GCP and GKE workflows while developing.
+#
+# Notes:
+#   Prefer plain, discoverable commands over clever aliases.
+# ============================================================
 
 gcloud-project() {
   gcloud config get-value project 2>/dev/null || echo "No active GCP project configured"

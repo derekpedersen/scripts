@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 
-# AWS helper functions for everyday CLI usage.
+# ============================================================
+# AWS helpers
+# ============================================================
+#
+# Purpose:
+#   Convenience wrappers around the AWS CLI for everyday local
+#   development and cluster administration.
+#
+# Notes:
+#   Keep functions shell-safe, readable, and idempotent. Source this
+#   file via bash/install.sh when you want it loaded in your shell.
+# ============================================================
 
 aws-current-profile() {
   if [[ -n "${AWS_PROFILE:-}" ]]; then

@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ============================================================
+# Tool installer controller
+# ============================================================
+#
+# Purpose:
+#   Dispatch install requests to the appropriate OS-specific logic and
+#   keep bundle installs consistent across macOS and Debian-based Linux.
+#
+# Notes:
+#   This script intentionally stays thin; platform-specific logic lives in
+#   tools/macos.sh and tools/linux.sh.
+# ============================================================
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 

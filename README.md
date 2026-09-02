@@ -9,6 +9,11 @@ Repository to hold all my helper scripts.
 - [bash/docker.bash](bash/docker.bash)
 - [bash/kubernetes.bash](bash/kubernetes.bash)
 
+## AI and agent guidance
+
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) — repo conventions for GitHub Copilot
+- [AGENTS.md](AGENTS.md) — general guidance for AI agents and automation working in this repository
+
 ## Tools
 
 - [tools/install.sh](tools/install.sh) — installs common development tools on macOS or Debian-based Linux

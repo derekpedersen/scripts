@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
-# Azure CLI helpers.
+# ============================================================
+# Azure CLI helpers
+# ============================================================
+#
+# Purpose:
+#   Shortcuts for common Azure CLI usage during development and
+#   Kubernetes deployment work.
+#
+# Notes:
+#   Keep commands explicit and easy to discover from the shell.
+# ============================================================
 
 az-subscriptions() {
   az account list --output table

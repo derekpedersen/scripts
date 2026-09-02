@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ============================================================
+# Tool bundle definitions
+# ============================================================
+#
+# Purpose:
+#   Maintain the canonical install bundles used by the repo's
+#   developer bootstrap installer.
+#
+# Notes:
+#   Keep bundle names stable and update the usage text in tools/install.sh
+#   whenever adding or changing install options.
+# ============================================================
+
 DEFAULT_BUNDLE=(
   git
   curl

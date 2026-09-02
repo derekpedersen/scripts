@@ -1,6 +1,15 @@
-# ─────────────────────────────────────────────
-# Docker cleanup helpers
-# ─────────────────────────────────────────────
+# ============================================================
+# Docker helpers
+# ============================================================
+#
+# Purpose:
+#   General-purpose Docker shortcuts for local development, registry
+#   access, and cleanup tasks.
+#
+# Notes:
+#   Keep destructive commands explicit and confirm before deleting
+#   containers, images, or volumes.
+# ============================================================
 
 # Log in to a Docker registry
 # Usage:

@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
-# Cloud helper bundle that loads the AWS, GCP, Azure, and DigitalOcean helpers.
-# This file is a convenience wrapper for multi-cloud environments.
+# ============================================================
+# Cloud helper bundle
+# ============================================================
+#
+# Purpose:
+#   Convenience wrapper for the multi-cloud helper set used in local
+#   development environments.
+#
+# Notes:
+#   This file is intentionally lightweight; the cloud-specific helper
+#   files are sourced separately by bash/install.sh.
+# ============================================================
 
 if command -v aws >/dev/null 2>&1; then
   :
