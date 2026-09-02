@@ -84,6 +84,38 @@ install_mac() {
       python3)
         brew install python
         ;;
+      postgres)
+        brew install postgresql@16
+        echo "Postgres installed. Start it with: brew services start postgresql@16"
+        ;;
+      redis)
+        brew install redis
+        echo "Redis installed. Start it with: brew services start redis"
+        ;;
+      mysql)
+        brew install mysql
+        echo "MySQL installed. Start it with: brew services start mysql"
+        ;;
+      clickhouse)
+        brew install clickhouse
+        echo "ClickHouse installed. Start it with: clickhouse local or brew services start clickhouse"
+        ;;
+      mongodb)
+        brew install mongodb-community
+        echo "MongoDB installed. Start it with: brew services start mongodb-community"
+        ;;
+      rabbitmq)
+        brew install rabbitmq
+        echo "RabbitMQ installed. Start it with: brew services start rabbitmq"
+        ;;
+      elasticsearch)
+        brew install elasticsearch
+        echo "Elasticsearch installed. Start it with: brew services start elasticsearch"
+        ;;
+      kafka)
+        brew install kafka
+        echo "Kafka installed. Start it with: brew services start kafka"
+        ;;
       *)
         echo "Unknown package for macOS: $pkg"
         ;;

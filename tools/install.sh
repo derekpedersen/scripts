@@ -21,16 +21,17 @@ case "$OS" in
 esac
 
 if [[ $# -eq 0 ]]; then
-  echo "Usage: $0 [default|full|dev|<tool> [tool ...]]"
+  echo "Usage: $0 [default|full|dev|services|<tool> [tool ...]]"
   echo "Examples:"
   echo "  $0 default"
   echo "  $0 full"
+  echo "  $0 services"
   echo "  $0 git nvm kubectl helm docker"
   exit 1
 fi
 
 BUNDLE_MODE=""
-if [[ "$1" == "default" || "$1" == "full" || "$1" == "dev" ]]; then
+if [[ "$1" == "default" || "$1" == "full" || "$1" == "dev" || "$1" == "services" ]]; then
   BUNDLE_MODE="$1"
   shift
 fi
@@ -42,6 +43,9 @@ if [[ -n "$BUNDLE_MODE" ]]; then
       ;;
     full|dev)
       set -- "${FULL_BUNDLE[@]}" "$@"
+      ;;
+    services)
+      set -- "${SERVICES_BUNDLE[@]}" "$@"
       ;;
   esac
 fi

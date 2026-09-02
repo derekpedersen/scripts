@@ -163,6 +163,74 @@ install_linux() {
       python3)
         install_pkg python3
         ;;
+      postgres)
+        install_pkg postgresql postgresql-contrib
+        if command -v pg_ctl >/dev/null 2>&1; then
+          echo "Postgres installed. Start it with: sudo service postgresql start"
+        fi
+        ;;
+      redis)
+        install_pkg redis-server
+        if command -v redis-server >/dev/null 2>&1; then
+          echo "Redis installed. Start it with: sudo service redis-server start"
+        fi
+        ;;
+      mysql)
+        install_pkg mysql-server
+        if command -v mysqld >/dev/null 2>&1; then
+          echo "MySQL installed. Start it with: sudo service mysql start"
+        fi
+        ;;
+      clickhouse)
+        install_pkg apt-transport-https ca-certificates gnupg
+        if ! command -v clickhouse-server >/dev/null 2>&1; then
+          echo "deb https://packages.clickhouse.com/deb stable main" | $SUDO tee /etc/apt/sources.list.d/clickhouse.list >/dev/null
+          curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | gpg --dearmor | $SUDO tee /etc/apt/trusted.gpg.d/clickhouse.gpg >/dev/null
+          $SUDO apt-get update
+          $SUDO apt-get install -y clickhouse-server clickhouse-client
+        fi
+        echo "ClickHouse installed. Start it with: sudo service clickhouse-server start"
+        ;;
+      mongodb)
+        install_pkg gnupg curl
+        if ! command -v mongod >/dev/null 2>&1; then
+          curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | $SUDO gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+          echo "deb [ arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(. /etc/os-release; echo "$VERSION_CODENAME")/mongodb-org/7.0 multiverse" | $SUDO tee /etc/apt/sources.list.d/mongodb-org-7.0.list >/dev/null
+          $SUDO apt-get update
+          $SUDO apt-get install -y mongodb-org
+        fi
+        echo "MongoDB installed. Start it with: sudo systemctl start mongod"
+        ;;
+      rabbitmq)
+        install_pkg curl gnupg
+        if ! command -v rabbitmq-server >/dev/null 2>&1; then
+          curl -fsSL https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | $SUDO gpg --dearmor -o /usr/share/keyrings/rabbitmq.gpg
+          echo "deb [signed-by=/usr/share/keyrings/rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ $(. /etc/os-release; echo "$VERSION_CODENAME") main" | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
+          $SUDO apt-get update
+          $SUDO apt-get install -y rabbitmq-server
+        fi
+        echo "RabbitMQ installed. Start it with: sudo systemctl start rabbitmq-server"
+        ;;
+      elasticsearch)
+        install_pkg gnupg curl
+        if ! command -v elasticsearch >/dev/null 2>&1; then
+          wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | $SUDO gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | $SUDO tee /etc/apt/sources.list.d/elastic-8.x.list >/dev/null
+          $SUDO apt-get update
+          $SUDO apt-get install -y elasticsearch
+        fi
+        echo "Elasticsearch installed. Start it with: sudo systemctl start elasticsearch"
+        ;;
+      kafka)
+        install_pkg curl ca-certificates
+        if ! command -v kafka-server-start >/dev/null 2>&1; then
+          $SUDO apt-get install -y openjdk-17-jre-headless
+          curl -fsSL https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz -o /tmp/kafka.tgz
+          mkdir -p /opt/kafka
+          tar -xzf /tmp/kafka.tgz -C /opt/kafka --strip-components=1
+          echo "Kafka downloaded to /opt/kafka. Start it with: /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties"
+        fi
+        ;;
       *)
         echo "Unknown package for Linux: $pkg"
         ;;

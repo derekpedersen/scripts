@@ -32,6 +32,23 @@ FULL_BUNDLE=(
   dotnetcore
   vscode
   code
+  postgres
+  redis
+  mysql
+  clickhouse
+  mongodb
+  rabbitmq
+)
+
+SERVICES_BUNDLE=(
+  postgres
+  redis
+  mysql
+  clickhouse
+  mongodb
+  rabbitmq
+  elasticsearch
+  kafka
 )
 
 ensure_root_or_sudo() {
