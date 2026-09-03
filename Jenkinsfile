@@ -104,7 +104,7 @@ EOF
                         echo "Resulting chart fixture:"
                         cat "$chart_tmp"
 
-                        grep -Eq '^version: [0-9]{4}\.[0-9]{2}\.[0-9]{2}\.[0-9]{4}$' "$chart_tmp"
+                        grep -Eq '^version: [0-9]{4}[.][0-9]{2}[.][0-9]{2}[.][0-9]{4}$' "$chart_tmp"
                         grep -Eq "^appVersion: ${expected_sha}$" "$chart_tmp"
                     '''
                 }
