@@ -215,7 +215,10 @@ HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
     file="$SCRIPT_DIR/$selected"
     if [[ -f "$file" ]]; then
       echo "# ---- begin $selected ----"
+      # Ensure a trailing newline even if the source file is missing one,
+      # otherwise its last line merges with the following comment marker.
       cat "$file"
+      echo
       echo "# ---- end $selected ----"
       echo
     fi
