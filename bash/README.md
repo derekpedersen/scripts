@@ -28,7 +28,13 @@ bash ./bash/install.sh
 Or install directly from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/feature/bashful/bash/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+```
+
+To test another branch or fork during bootstrap:
+
+```bash
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
 ```
 
 The installer is interactive and file-aware. It scans the helper folder for `.bash` files and asks which ones you want enabled, such as:

@@ -1,11 +1,54 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+bootstrap_from_github() {
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "curl is required to bootstrap bash helper files from GitHub."
+    return 1
+  fi
+
+  local repo="${SCRIPTS_REPO:-derekpedersen/scripts}"
+  local ref="${SCRIPTS_REF:-main}"
+  local tmpdir
+  local archive
+  local extracted_dir
+  local rc
+
+  tmpdir="$(mktemp -d)"
+  archive="$tmpdir/scripts.tar.gz"
+
+  echo "Bootstrapping bash helper installer from github.com/$repo ($ref)..."
+  curl -fsSL "https://codeload.github.com/$repo/tar.gz/refs/heads/$ref" -o "$archive"
+  tar -xzf "$archive" -C "$tmpdir"
+
+  extracted_dir="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/bash/install.sh" ]]; then
+    echo "Bootstrap failed: could not find bash/install.sh in downloaded archive."
+    rm -rf "$tmpdir"
+    return 1
+  fi
+
+  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/bash/install.sh" "$@"
+  rc=$?
+  rm -rf "$tmpdir"
+  return $rc
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SHELL_NAME="${SHELL:-}"
 MARKER_BEGIN="# >>> scripts/bash helpers >>>"
 MARKER_END="# <<< scripts/bash helpers <<<"
 LEGACY_LINE="# Added by scripts/bash/install.sh"
+
+if ! compgen -G "$SCRIPT_DIR/*.bash" >/dev/null 2>&1; then
+  if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
+    echo "No helper files found in $SCRIPT_DIR and bootstrap already ran."
+    exit 1
+  fi
+
+  bootstrap_from_github "$@"
+  exit $?
+fi
 
 if [[ "$SHELL_NAME" == *"zsh"* ]]; then
   PROFILE_FILE="$HOME/.zshrc"
