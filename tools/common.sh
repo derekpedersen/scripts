@@ -180,6 +180,157 @@ configure_ssh_key() {
   cat "$key_path.pub"
 }
 
+configure_git_completion() {
+  # Enable git tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  local completion_source=""
+
+  # Determine which completion file to source based on platform
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    # macOS: git-completion comes with bash-completion via Homebrew
+    if [[ -f /usr/local/etc/bash_completion.d/git-completion.bash ]]; then
+      completion_source="/usr/local/etc/bash_completion.d/git-completion.bash"
+    elif [[ -f /opt/homebrew/etc/bash_completion.d/git-completion.bash ]]; then
+      completion_source="/opt/homebrew/etc/bash_completion.d/git-completion.bash"
+    fi
+  else
+    # Linux: git-completion is in /usr/share/bash-completion/completions/
+    if [[ -f /usr/share/bash-completion/completions/git ]]; then
+      completion_source="/usr/share/bash-completion/completions/git"
+    fi
+  fi
+
+  if [[ -z "$completion_source" ]]; then
+    return 0
+  fi
+
+  # Add source line to bashrc if not already present
+  if ! grep -q "source.*git.*completion" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# Git completion" >> "$shell_profile"
+    echo "[[ -f $completion_source ]] && source $completion_source" >> "$shell_profile"
+  fi
+}
+
+configure_kubectl_completion() {
+  # Enable kubectl tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v kubectl >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  if ! grep -q "kubectl completion bash" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# kubectl completion" >> "$shell_profile"
+    echo "source <(kubectl completion bash)" >> "$shell_profile"
+  fi
+}
+
+configure_helm_completion() {
+  # Enable helm tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v helm >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  if ! grep -q "helm completion bash" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# helm completion" >> "$shell_profile"
+    echo "source <(helm completion bash)" >> "$shell_profile"
+  fi
+}
+
+configure_docker_completion() {
+  # Enable docker tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v docker >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  if ! grep -q "docker completion" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# docker completion" >> "$shell_profile"
+    echo "source <(docker completion bash 2>/dev/null)" >> "$shell_profile"
+  fi
+}
+
+configure_aws_completion() {
+  # Enable aws tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v aws >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  if ! grep -q "aws_completer" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# aws completion" >> "$shell_profile"
+    echo "complete -C '$(which aws_completer)' aws" >> "$shell_profile"
+  fi
+}
+
+configure_gcloud_completion() {
+  # Enable gcloud tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v gcloud >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  # gcloud completion is typically installed with gcloud itself
+  local completion_source=""
+  if [[ -f "$HOME/.local/share/google-cloud-sdk/completion.bash.inc" ]]; then
+    completion_source="$HOME/.local/share/google-cloud-sdk/completion.bash.inc"
+  elif [[ -f /usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc ]]; then
+    completion_source="/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+  elif [[ -f /opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc ]]; then
+    completion_source="/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+  fi
+  
+  if [[ -z "$completion_source" ]]; then
+    return 0
+  fi
+  
+  if ! grep -q "gcloud.*completion" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# gcloud completion" >> "$shell_profile"
+    echo "[[ -f $completion_source ]] && source $completion_source" >> "$shell_profile"
+  fi
+}
+
+configure_az_completion() {
+  # Enable azure-cli tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v az >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  if ! grep -q "az_completer" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# az completion" >> "$shell_profile"
+    echo "source <(az completion bash 2>/dev/null)" >> "$shell_profile"
+  fi
+}
+
+configure_doctl_completion() {
+  # Enable doctl tab completion in bash
+  local shell_profile="$HOME/.bashrc"
+  
+  if ! command -v doctl >/dev/null 2>&1; then
+    return 0
+  fi
+  
+  if ! grep -q "doctl completion bash" "$shell_profile" 2>/dev/null; then
+    echo "" >> "$shell_profile"
+    echo "# doctl completion" >> "$shell_profile"
+    echo "source <(doctl completion bash)" >> "$shell_profile"
+  fi
+}
+
 configure_identity_interactive() {
   local name="${GIT_USER_NAME:-}"
   local email="${GIT_USER_EMAIL:-}"

@@ -17,38 +17,47 @@ install_mac() {
   for pkg in "$@"; do
     case "$pkg" in
       git)
-        brew install git
+        brew install git bash-completion
+        configure_git_completion
         ;;
       gpg)
         brew install gnupg
         ;;
       helm)
         brew install helm
+        configure_helm_completion
         ;;
       kubectl)
         brew install kubectl
+        configure_kubectl_completion
         ;;
       kubernetes-cli)
         brew install kubectl
+        configure_kubectl_completion
         ;;
       docker)
         echo "Docker Desktop is typically installed via the official app, not Homebrew."
         echo "Install it from: https://www.docker.com/products/docker-desktop/"
+        configure_docker_completion
         ;;
       gcloud|google-cloud)
         brew install --cask google-cloud-sdk
+        configure_gcloud_completion
         ;;
       aws|awscli)
         brew install awscli
+        configure_aws_completion
         ;;
       eksctl)
         brew install eksctl
         ;;
       az|azure|azure-cli)
         brew install azure-cli
+        configure_az_completion
         ;;
       doctl|digitalocean|doks)
         brew install doctl
+        configure_doctl_completion
         ;;
       golang)
         brew install go

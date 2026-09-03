@@ -36,7 +36,8 @@ install_linux() {
   for pkg in "$@"; do
     case "$pkg" in
       git)
-        install_pkg git
+        install_pkg git bash-completion
+        configure_git_completion
         ;;
       gpg)
         install_pkg gnupg
@@ -46,6 +47,7 @@ install_linux() {
         if ! command -v helm >/dev/null 2>&1; then
           curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
         fi
+        configure_helm_completion
         ;;
       kubectl)
         install_pkg curl
@@ -53,6 +55,7 @@ install_linux() {
           curl -fsSL -o /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x /usr/local/bin/kubectl
         fi
+        configure_kubectl_completion
         ;;
       kubernetes-cli)
         install_pkg curl
@@ -60,6 +63,7 @@ install_linux() {
           curl -fsSL -o /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x /usr/local/bin/kubectl
         fi
+        configure_kubectl_completion
         ;;
       golang)
         install_pkg wget tar
@@ -153,6 +157,7 @@ install_linux() {
             echo "docker install requires sudo."
           fi
         fi
+        configure_docker_completion
         ;;
       gcloud|google-cloud)
         if ! command -v gcloud >/dev/null 2>&1; then
@@ -162,12 +167,14 @@ install_linux() {
           $SUDO apt-get update
           $SUDO apt-get install -y google-cloud-cli
         fi
+        configure_gcloud_completion
         ;;
       aws|awscli)
         if ! command -v aws >/dev/null 2>&1; then
           install_pkg unzip curl
           $SUDO apt-get install -y awscli
         fi
+        configure_aws_completion
         ;;
       eksctl)
         if ! command -v eksctl >/dev/null 2>&1; then
@@ -180,6 +187,7 @@ install_linux() {
         if ! command -v az >/dev/null 2>&1; then
           curl -sL https://aka.ms/InstallAzureCLIDeb | $SUDO bash
         fi
+        configure_az_completion
         ;;
       doctl|digitalocean|doks)
         if ! command -v doctl >/dev/null 2>&1; then
@@ -187,6 +195,7 @@ install_linux() {
           tar -xzf /tmp/doctl.tar.gz -C /tmp
           $SUDO install /tmp/doctl /usr/local/bin/doctl
         fi
+        configure_doctl_completion
         ;;
       curl)
         install_pkg curl
