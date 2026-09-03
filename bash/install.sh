@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# The installer concatenates the selected helper files into a single managed
+# file next to the user's shell profile (e.g. ~/.scripts-bash-helpers) and
+# sources that file from the profile. This keeps the profile self-contained:
+# no external repo path or temp directory is referenced after install.
+
 bootstrap_from_github() {
   if ! command -v curl >/dev/null 2>&1; then
     echo "curl is required to bootstrap bash helper files from GitHub."
@@ -197,26 +202,39 @@ if [[ "$(uname -s)" == "Darwin" ]] && [[ "$SHELL_NAME" == *"bash"* ]]; then
 fi
 
 selected_list="${selected_files[*]}"
+
+# Managed helpers file lives next to the profile (e.g. ~/.scripts-bash-helpers)
+HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
+
+{
+  echo "# Managed by scripts/bash/install.sh. Do not edit directly."
+  echo "# Rerun the installer to update: https://github.com/derekpedersen/scripts"
+  echo "# selected: $selected_list"
+  echo
+  for selected in "${selected_files[@]}"; do
+    file="$SCRIPT_DIR/$selected"
+    if [[ -f "$file" ]]; then
+      echo "# ---- begin $selected ----"
+      cat "$file"
+      echo "# ---- end $selected ----"
+      echo
+    fi
+  done
+} > "$HELPERS_FILE"
+
 SOURCE_BLOCK=$(cat <<EOF
 
 $MARKER_BEGIN
 # selected: $selected_list
-for file in "$SCRIPT_DIR"/*.bash; do
-  name="\$(basename "\$file")"
-  for selected in $selected_list; do
-    if [[ "\$name" == "\$selected" ]]; then
-      source "\$file"
-      break
-    fi
-  done
-done
+[[ -f "$HELPERS_FILE" ]] && source "$HELPERS_FILE"
 $MARKER_END
 EOF
 )
 
 printf '%s\n' "$SOURCE_BLOCK" >> "$PROFILE_FILE"
 
-echo "Added Bash helper sources to $PROFILE_FILE"
+echo "Wrote Bash helpers to $HELPERS_FILE"
+echo "Added Bash helper source to $PROFILE_FILE"
 if ((${#selected_files[@]} > 0)); then
   printf 'Enabled: %s\n' "${selected_files[*]}"
 fi

@@ -56,10 +56,13 @@ One-liner from GitHub:
 curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
 ```
 
-Optional override for testing another branch or fork during bootstrap:
+The installer concatenates the selected helper files into a single managed file (`~/.scripts-bash-helpers`) and sources it from your shell profile. The profile only references that stable file, so helpers keep working even if the repo clone or bootstrap temp directory is removed. Rerun the installer to update the helpers.
+
+Optional overrides for testing another branch or fork, or changing the managed helpers file:
 
 ```bash
 SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+SCRIPTS_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
 ```
 
 ### Install developer tools
