@@ -47,7 +47,8 @@ bootstrap_from_github() {
   return $rc
 }
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 
 if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/macos.sh" || ! -f "$SCRIPT_DIR/linux.sh" ]]; then
   if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
