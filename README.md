@@ -53,7 +53,13 @@ bash ./bash/install.sh
 One-liner from GitHub:
 
 ```bash
-tmpdir="$(mktemp -d)" && curl -fsSL https://codeload.github.com/derekpedersen/scripts/tar.gz/refs/heads/main | tar -xz -C "$tmpdir" && bash "$tmpdir/scripts-main/bash/install.sh"; rc=$?; rm -rf "$tmpdir"; exit $rc
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+```
+
+Optional override for testing another branch or fork during bootstrap:
+
+```bash
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
 ```
 
 ### Install developer tools
@@ -67,7 +73,13 @@ bash ./tools/install.sh default
 One-liner from GitHub (replace default with full, dev, services, or cloud):
 
 ```bash
-tmpdir="$(mktemp -d)" && curl -fsSL https://codeload.github.com/derekpedersen/scripts/tar.gz/refs/heads/main | tar -xz -C "$tmpdir" && bash "$tmpdir/scripts-main/tools/install.sh" default; rc=$?; rm -rf "$tmpdir"; exit $rc
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools/install.sh | bash -s -- default
+```
+
+Optional override for testing another branch or fork during bootstrap:
+
+```bash
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools/install.sh | bash -s -- default
 ```
 
 ## Tool installer bundles

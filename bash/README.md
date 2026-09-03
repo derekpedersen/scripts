@@ -28,7 +28,13 @@ bash ./bash/install.sh
 Or install directly from GitHub:
 
 ```bash
-tmpdir="$(mktemp -d)" && curl -fsSL https://codeload.github.com/derekpedersen/scripts/tar.gz/refs/heads/main | tar -xz -C "$tmpdir" && bash "$tmpdir/scripts-main/bash/install.sh"; rc=$?; rm -rf "$tmpdir"; exit $rc
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+```
+
+To test another branch or fork during bootstrap:
+
+```bash
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
 ```
 
 The installer is interactive and file-aware. It scans the helper folder for `.bash` files and asks which ones you want enabled, such as:

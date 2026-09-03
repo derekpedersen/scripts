@@ -14,7 +14,51 @@ set -euo pipefail
 #   tools/macos.sh and tools/linux.sh.
 # ============================================================
 
+bootstrap_from_github() {
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "curl is required to bootstrap installer files from GitHub."
+    return 1
+  fi
+
+  local repo="${SCRIPTS_REPO:-derekpedersen/scripts}"
+  local ref="${SCRIPTS_REF:-main}"
+  local tmpdir
+  local archive
+  local extracted_dir
+  local rc
+
+  tmpdir="$(mktemp -d)"
+  archive="$tmpdir/scripts.tar.gz"
+
+  echo "Bootstrapping tools installer from github.com/$repo ($ref)..."
+  curl -fsSL "https://codeload.github.com/$repo/tar.gz/refs/heads/$ref" -o "$archive"
+  tar -xzf "$archive" -C "$tmpdir"
+
+  extracted_dir="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/tools/install.sh" ]]; then
+    echo "Bootstrap failed: could not find tools/install.sh in downloaded archive."
+    rm -rf "$tmpdir"
+    return 1
+  fi
+
+  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/tools/install.sh" "$@"
+  rc=$?
+  rm -rf "$tmpdir"
+  return $rc
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/macos.sh" || ! -f "$SCRIPT_DIR/linux.sh" ]]; then
+  if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
+    echo "Required installer files are missing from $SCRIPT_DIR and bootstrap already ran."
+    exit 1
+  fi
+
+  bootstrap_from_github "$@"
+  exit $?
+fi
+
 source "$SCRIPT_DIR/common.sh"
 
 OS="$(uname -s)"
