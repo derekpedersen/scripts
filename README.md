@@ -1,61 +1,84 @@
 # Scripts
 
-Repository to hold all my helper scripts.
+Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling for local development.
 
-## Bash
+## What this repo contains
 
-- [bash/README.md](bash/README.md) — Bash helpers and shortcuts for Git, Docker, and Kubernetes
-- [bash/git.bash](bash/git.bash)
-- [bash/docker.bash](bash/docker.bash)
-- [bash/kubernetes.bash](bash/kubernetes.bash)
+- [bash](bash) for shell helper functions and aliases
+- [tools](tools) for OS-aware developer tool installation
+- [helm](helm) for Helm chart version stamping helpers
+- [Jenkinsfile](Jenkinsfile) for CI validation of script syntax and installer smoke checks
 
-## AI and agent guidance
+## Repository map
 
-- [.github/copilot-instructions.md](.github/copilot-instructions.md) — repo conventions for GitHub Copilot
-- [AGENTS.md](AGENTS.md) — general guidance for AI agents and automation working in this repository
+### Bash helpers
 
-## Tools
+- [bash/install.sh](bash/install.sh): interactive helper loader that writes a managed source block to your shell profile
+- [bash/README.md](bash/README.md): detailed helper documentation
+- [bash/git.bash](bash/git.bash): git workflow and cleanup helpers
+- [bash/docker.bash](bash/docker.bash): Docker and cleanup helpers
+- [bash/kubernetes.bash](bash/kubernetes.bash): kubectl and troubleshooting helpers
+- [bash/aws.bash](bash/aws.bash): AWS CLI helpers
+- [bash/gcloud.bash](bash/gcloud.bash): Google Cloud helpers
+- [bash/azure.bash](bash/azure.bash): Azure CLI helpers
+- [bash/doctl.bash](bash/doctl.bash): DigitalOcean helpers
+- [bash/cloud.bash](bash/cloud.bash): multi-cloud status helper
 
-- [tools/install.sh](tools/install.sh) — installs common development tools on macOS or Debian-based Linux
+### Tool installer
 
-Built-in bundle names:
+- [tools/install.sh](tools/install.sh): main installer controller
+- [tools/common.sh](tools/common.sh): bundle definitions and identity helpers (git, gpg, ssh)
+- [tools/macos.sh](tools/macos.sh): macOS installation logic
+- [tools/linux.sh](tools/linux.sh): Debian-based Linux installation logic
 
-- `default` — core developer setup
-- `full` — default plus broader dev tools, cloud tooling, and common local services
-- `dev` — same as `full`
-- `services` — local database/service stack including MongoDB, RabbitMQ, Elasticsearch, and Kafka
-- `cloud` — AWS, GCP, Azure, and DigitalOcean CLI tooling plus JSON/YAML helpers
+### Helm
 
-Supported tool names:
+- [helm/set-version.sh](helm/set-version.sh): sets version and appVersion in .helm/Chart.yaml from timestamp and current git commit
 
-- `git`
-- `nvm`
-- `node`
-- `helm`
-- `kubectl` / `kubernetes-cli`
-- `golang`
-- `docker`
-- `gcloud` / `google-cloud`
-- `aws` / `awscli`
-- `eksctl`
-- `az` / `azure` / `azure-cli`
-- `doctl` / `digitalocean` / `doks`
-- `dotnet` / `dotnetcore`
-- `vscode` / `code`
-- `curl`
-- `unzip`
-- `wget`
-- `python3`
-- `postgres`
-- `redis`
-- `mysql`
-- `clickhouse`
-- `mongodb`
-- `rabbitmq`
-- `elasticsearch`
-- `kafka`
+### Guidance and automation
 
-Examples:
+- [AGENTS.md](AGENTS.md): repository agent guidance
+- [.github/copilot-instructions.md](.github/copilot-instructions.md): Copilot-specific conventions
+
+## Quick start
+
+### Install Bash helpers
+
+From this repo:
+
+```bash
+bash ./bash/install.sh
+```
+
+One-liner from GitHub:
+
+```bash
+tmpdir="$(mktemp -d)" && curl -fsSL https://codeload.github.com/derekpedersen/scripts/tar.gz/refs/heads/main | tar -xz -C "$tmpdir" && bash "$tmpdir/scripts-main/bash/install.sh"; rc=$?; rm -rf "$tmpdir"; exit $rc
+```
+
+### Install developer tools
+
+From this repo:
+
+```bash
+bash ./tools/install.sh default
+```
+
+One-liner from GitHub (replace default with full, dev, services, or cloud):
+
+```bash
+tmpdir="$(mktemp -d)" && curl -fsSL https://codeload.github.com/derekpedersen/scripts/tar.gz/refs/heads/main | tar -xz -C "$tmpdir" && bash "$tmpdir/scripts-main/tools/install.sh" default; rc=$?; rm -rf "$tmpdir"; exit $rc
+```
+
+## Tool installer bundles
+
+- default: core developer setup
+- full: default plus broader dev, cloud tooling, and local services
+- dev: alias of full
+- services: local data/service stack
+- cloud: cloud CLIs and JSON/YAML helpers
+
+Bundle quick examples:
 
 ```bash
 bash ./tools/install.sh default
@@ -63,11 +86,84 @@ bash ./tools/install.sh full
 bash ./tools/install.sh dev
 bash ./tools/install.sh services
 bash ./tools/install.sh cloud
-bash ./tools/install.sh git nvm node kubectl helm docker dotnetcore vscode
 ```
 
-The default bundle installs the core dev setup in dependency-safe order, using `nvm` first and then installing Node LTS through it. The service bundles are intentionally separate so you can install only the local databases and dev services you want.
+Dry run example:
 
-## Helm
+```bash
+bash ./tools/install.sh full --dry-run
+```
 
-- [helm/set-version.sh](helm/set-version.sh)
+Identity setup examples:
+
+```bash
+GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' bash ./tools/install.sh git-config
+GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' GPG_KEY_ID='ABC123DEF456' bash ./tools/install.sh gpg git-signing
+SSH_KEY_EMAIL='jane@example.com' bash ./tools/install.sh ssh-key
+bash ./tools/install.sh identity
+```
+
+## Supported tool names
+
+- git
+- gpg
+- nvm
+- node
+- helm
+- kubectl
+- kubernetes-cli
+- golang
+- docker
+- gcloud
+- google-cloud
+- aws
+- awscli
+- eksctl
+- az
+- azure
+- azure-cli
+- doctl
+- digitalocean
+- doks
+- dotnet
+- dotnetcore
+- vscode
+- code
+- curl
+- unzip
+- wget
+- python3
+- postgres
+- redis
+- mysql
+- clickhouse
+- mongodb
+- rabbitmq
+- elasticsearch
+- kafka
+- git-config
+- git-signing
+- ssh-key
+- identity
+
+## Helm helper usage
+
+Run from repo root:
+
+```bash
+bash ./helm/set-version.sh
+```
+
+This updates .helm/Chart.yaml fields:
+
+- version to current timestamp format YYYY.MM.DD.HHMM
+- appVersion to the current git commit SHA
+
+## CI behavior
+
+[Jenkinsfile](Jenkinsfile) validates:
+
+- syntax of files in [bash](bash)
+- syntax of files in [tools](tools)
+- syntax of files in [helm](helm)
+- installer smoke tests for default, services, and cloud bundles using dry-run mode

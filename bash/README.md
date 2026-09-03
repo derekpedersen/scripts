@@ -28,7 +28,7 @@ bash ./bash/install.sh
 Or install directly from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/feature/bashful/bash/install.sh | bash
+tmpdir="$(mktemp -d)" && curl -fsSL https://codeload.github.com/derekpedersen/scripts/tar.gz/refs/heads/main | tar -xz -C "$tmpdir" && bash "$tmpdir/scripts-main/bash/install.sh"; rc=$?; rm -rf "$tmpdir"; exit $rc
 ```
 
 The installer is interactive and file-aware. It scans the helper folder for `.bash` files and asks which ones you want enabled, such as:
