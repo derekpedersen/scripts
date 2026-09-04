@@ -4,14 +4,16 @@ This folder contains a small local Docker Compose stack for common application d
 
 ## Included services
 
-- PostgreSQL on `localhost:5433`
-- Redis on `localhost:6380`
-- RabbitMQ AMQP on `localhost:5673`
-- RabbitMQ management UI on `localhost:15673`
-- MongoDB on `localhost:27018`
-- Elasticsearch on `localhost:9201` (optional advanced service)
-- Prometheus on `localhost:9091` (optional observability service)
-- Grafana on `localhost:3001` (optional observability dashboard)
+- PostgreSQL on a dynamic port per environment
+- Redis on a dynamic port per environment
+- RabbitMQ AMQP on a dynamic port per environment
+- RabbitMQ management UI on a dynamic port per environment
+- MongoDB on a dynamic port per environment
+- Elasticsearch on a dynamic port per environment (optional advanced service)
+- MySQL on a dynamic port per environment (optional advanced service)
+- Kafka on a dynamic port per environment (optional advanced service)
+- Prometheus on a dynamic port per environment (optional observability service)
+- Grafana on a dynamic port per environment (optional observability dashboard)
 
 ## Quick start
 
@@ -37,7 +39,7 @@ You will be prompted to choose a preset such as:
 - custom
 - exit
 
-The custom selector accepts numbered multi-select input such as `1 3 5` or `all`, and includes the optional Elasticsearch, Prometheus, and Grafana services in the selection list.
+The custom selector accepts numbered multi-select input such as `1 3 5` or `all`, and includes the optional Elasticsearch, MySQL, Kafka, Prometheus, and Grafana services in the selection list.
 
 ## Useful commands
 
@@ -49,4 +51,4 @@ bash ./services/local-dev.sh down
 
 ## Notes
 
-This stack keeps the common local development needs focused on database-backed and event-driven apps, while still exposing Elasticsearch, Prometheus, and Grafana as optional advanced services for search-heavy and observability-focused workflows.
+This stack keeps the common local development needs focused on database-backed and event-driven apps, while still exposing Elasticsearch, MySQL, Kafka, Prometheus, and Grafana as optional advanced services for search-heavy, event-driven, and observability-focused workflows.

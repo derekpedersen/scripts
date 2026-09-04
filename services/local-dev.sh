@@ -123,7 +123,7 @@ write_env_file() {
   local env_file="$SCRIPT_DIR/.env.${env_name}"
   local base_port
   base_port="$(compute_port_base "$env_name")"
-  local postgres_port redis_port rabbitmq_port rabbitmq_management_port mongodb_port elasticsearch_port elasticsearch_transport_port prometheus_port grafana_port
+  local postgres_port redis_port rabbitmq_port rabbitmq_management_port mongodb_port elasticsearch_port elasticsearch_transport_port mysql_port kafka_port zookeeper_port prometheus_port grafana_port
 
   postgres_port="$(get_next_free_port "$((5433 + base_port))")"
   redis_port="$(get_next_free_port "$((6380 + base_port))")"
@@ -132,6 +132,9 @@ write_env_file() {
   mongodb_port="$(get_next_free_port "$((27018 + base_port))")"
   elasticsearch_port="$(get_next_free_port "$((9201 + base_port))")"
   elasticsearch_transport_port="$(get_next_free_port "$((9301 + base_port))")"
+  mysql_port="$(get_next_free_port "$((3307 + base_port))")"
+  zookeeper_port="$(get_next_free_port "$((2182 + base_port))")"
+  kafka_port="$(get_next_free_port "$((9093 + base_port))")"
   prometheus_port="$(get_next_free_port "$((9091 + base_port))")"
   grafana_port="$(get_next_free_port "$((3001 + base_port))")"
 
@@ -144,6 +147,9 @@ RABBITMQ_MANAGEMENT_PORT=${rabbitmq_management_port}
 MONGODB_PORT=${mongodb_port}
 ELASTICSEARCH_PORT=${elasticsearch_port}
 ELASTICSEARCH_TRANSPORT_PORT=${elasticsearch_transport_port}
+MYSQL_PORT=${mysql_port}
+ZOOKEEPER_PORT=${zookeeper_port}
+KAFKA_PORT=${kafka_port}
 PROMETHEUS_PORT=${prometheus_port}
 GRAFANA_PORT=${grafana_port}
 EOF
@@ -162,6 +168,8 @@ service_names() {
     rabbitmq) echo "rabbitmq" ;;
     mongodb) echo "mongodb" ;;
     elasticsearch) echo "elasticsearch" ;;
+    mysql) echo "mysql" ;;
+    kafka) echo "kafka" ;;
     prometheus) echo "prometheus" ;;
     grafana) echo "grafana" ;;
     *) echo "" ;;
@@ -206,7 +214,7 @@ get_yes_no() {
 }
 
 custom_select() {
-  local -a services=(postgres redis rabbitmq mongodb elasticsearch prometheus grafana)
+  local -a services=(postgres redis rabbitmq mongodb elasticsearch mysql kafka prometheus grafana)
   local -a selected=()
   local service
   local input=""
@@ -242,8 +250,10 @@ custom_select() {
         3) selected+=("rabbitmq") ;;
         4) selected+=("mongodb") ;;
         5) selected+=("elasticsearch") ;;
-        6) selected+=("prometheus") ;;
-        7) selected+=("grafana") ;;
+        6) selected+=("mysql") ;;
+        7) selected+=("kafka") ;;
+        8) selected+=("prometheus") ;;
+        9) selected+=("grafana") ;;
         *)
           echo "Invalid selection: $choice"
           valid=false
@@ -348,6 +358,8 @@ start_services() {
   echo "  rabbitmq      => localhost:$(grep '^RABBITMQ_PORT=' "$ENV_FILE" | cut -d= -f2) (management UI: $(grep '^RABBITMQ_MANAGEMENT_PORT=' "$ENV_FILE" | cut -d= -f2))"
   echo "  mongodb       => localhost:$(grep '^MONGODB_PORT=' "$ENV_FILE" | cut -d= -f2)"
   echo "  elasticsearch => localhost:$(grep '^ELASTICSEARCH_PORT=' "$ENV_FILE" | cut -d= -f2)"
+  echo "  mysql         => localhost:$(grep '^MYSQL_PORT=' "$ENV_FILE" | cut -d= -f2)"
+  echo "  kafka         => localhost:$(grep '^KAFKA_PORT=' "$ENV_FILE" | cut -d= -f2)"
   echo "  prometheus    => localhost:$(grep '^PROMETHEUS_PORT=' "$ENV_FILE" | cut -d= -f2)"
   echo "  grafana       => localhost:$(grep '^GRAFANA_PORT=' "$ENV_FILE" | cut -d= -f2)"
 }
