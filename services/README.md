@@ -10,6 +10,8 @@ This folder contains a small local Docker Compose stack for common application d
 - RabbitMQ management UI on `localhost:15673`
 - MongoDB on `localhost:27018`
 - Elasticsearch on `localhost:9201` (optional advanced service)
+- Prometheus on `localhost:9091` (optional observability service)
+- Grafana on `localhost:3001` (optional observability dashboard)
 
 ## Quick start
 
@@ -31,10 +33,11 @@ You will be prompted to choose a preset such as:
 - jamstack
 - serverless
 - xampp
+- observability
 - custom
 - exit
 
-The custom selector accepts numbered multi-select input such as `1 3 5` or `all`, and includes the optional Elasticsearch service in the selection list.
+The custom selector accepts numbered multi-select input such as `1 3 5` or `all`, and includes the optional Elasticsearch, Prometheus, and Grafana services in the selection list.
 
 ## Useful commands
 
@@ -46,4 +49,4 @@ bash ./services/local-dev.sh down
 
 ## Notes
 
-This stack keeps the common local development needs focused on database-backed and event-driven apps, while still exposing Elasticsearch as an optional advanced service for search-heavy workflows.
+This stack keeps the common local development needs focused on database-backed and event-driven apps, while still exposing Elasticsearch, Prometheus, and Grafana as optional advanced services for search-heavy and observability-focused workflows.

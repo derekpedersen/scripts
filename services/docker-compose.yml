@@ -1,14 +1,14 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: local-dev-postgres
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: app
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -19,11 +19,11 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: local-dev-redis
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "6380:6379"
+      - "${REDIS_PORT:-6380}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -34,14 +34,14 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
-    container_name: local-dev-rabbitmq
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-rabbitmq
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "5673:5672"
-      - "15673:15672"
+      - "${RABBITMQ_PORT:-5673}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15673}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -52,13 +52,13 @@ services:
 
   mongodb:
     image: mongo:7
-    container_name: local-dev-mongo
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-mongo
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
-      - "27018:27017"
+      - "${MONGODB_PORT:-27018}:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -69,19 +69,58 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
-    container_name: local-dev-elasticsearch
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-elasticsearch
     restart: unless-stopped
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
       ES_JAVA_OPTS: -Xms512m -Xmx512m
     ports:
-      - "9201:9200"
-      - "9301:9300"
+      - "${ELASTICSEARCH_PORT:-9201}:9200"
+      - "${ELASTICSEARCH_TRANSPORT_PORT:-9301}:9300"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.listen-address=:9090
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: ${COMPOSE_CONTAINER_PREFIX:-local-dev}-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      PROMETHEUS_URL: http://prometheus:9090
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 10
@@ -92,3 +131,5 @@ volumes:
   rabbitmq_data:
   mongo_data:
   elasticsearch_data:
+  prometheus_data:
+  grafana_data:
