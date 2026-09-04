@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+install_apt_pkg_if_missing() {
+  local pkg="$1"
+  local binary_name="${2:-$1}"
+
+  if command -v "$binary_name" >/dev/null 2>&1 || dpkg -s "$pkg" >/dev/null 2>&1; then
+    LINUX_SKIPPED_COUNT=$((LINUX_SKIPPED_COUNT + 1))
+    return 0
+  fi
+
+  if [[ -n "${SUDO:-}" ]]; then
+    $SUDO apt-get install -y "$pkg"
+  else
+    apt-get install -y "$pkg"
+  fi
+}
+
 install_linux() {
+  LINUX_SKIPPED_COUNT=0
   echo "Detected Linux"
 
   if [[ -f /etc/os-release ]]; then
@@ -36,21 +53,24 @@ install_linux() {
   for pkg in "$@"; do
     case "$pkg" in
       git)
-        install_pkg git bash-completion
+        install_apt_pkg_if_missing "git" "git"
+        install_apt_pkg_if_missing "bash-completion" "bash"
         configure_git_completion
         ;;
       gpg)
-        install_pkg gnupg
+        install_apt_pkg_if_missing "gnupg" "gpg"
         ;;
       helm)
-        install_pkg curl apt-transport-https gnupg
+        install_apt_pkg_if_missing "curl" "curl"
+        install_apt_pkg_if_missing "apt-transport-https" "apt"
+        install_apt_pkg_if_missing "gnupg" "gpg"
         if ! command -v helm >/dev/null 2>&1; then
           curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
         fi
         configure_helm_completion
         ;;
       kubectl)
-        install_pkg curl
+        install_apt_pkg_if_missing "curl" "curl"
         if ! command -v kubectl >/dev/null 2>&1; then
           curl -fsSL -o /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x /usr/local/bin/kubectl
@@ -58,7 +78,7 @@ install_linux() {
         configure_kubectl_completion
         ;;
       kubernetes-cli)
-        install_pkg curl
+        install_apt_pkg_if_missing "curl" "curl"
         if ! command -v kubectl >/dev/null 2>&1; then
           curl -fsSL -o /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x /usr/local/bin/kubectl
@@ -66,7 +86,8 @@ install_linux() {
         configure_kubectl_completion
         ;;
       golang)
-        install_pkg wget tar
+        install_apt_pkg_if_missing "wget" "wget"
+        install_apt_pkg_if_missing "tar" "tar"
         if ! command -v go >/dev/null 2>&1; then
           GO_VERSION="1.22.7"
           cd /tmp
@@ -105,7 +126,9 @@ install_linux() {
         fi
         ;;
       dotnetcore)
-        install_pkg wget gpg apt-transport-https
+        install_apt_pkg_if_missing "wget" "wget"
+        install_apt_pkg_if_missing "gpg" "gpg"
+        install_apt_pkg_if_missing "apt-transport-https" "apt"
         if ! command -v dotnet >/dev/null 2>&1; then
           wget https://packages.microsoft.com/config/ubuntu/$(. /etc/os-release; echo "$VERSION_ID")/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
           if [[ -n "${SUDO:-}" ]]; then
@@ -120,7 +143,9 @@ install_linux() {
         fi
         ;;
       dotnet)
-        install_pkg wget gpg apt-transport-https
+        install_apt_pkg_if_missing "wget" "wget"
+        install_apt_pkg_if_missing "gpg" "gpg"
+        install_apt_pkg_if_missing "apt-transport-https" "apt"
         if ! command -v dotnet >/dev/null 2>&1; then
           wget https://packages.microsoft.com/config/ubuntu/$(. /etc/os-release; echo "$VERSION_ID")/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
           if [[ -n "${SUDO:-}" ]]; then
@@ -144,7 +169,10 @@ install_linux() {
         fi
         ;;
       docker)
-        install_pkg ca-certificates curl gnupg lsb-release
+        install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
+        install_apt_pkg_if_missing "curl" "curl"
+        install_apt_pkg_if_missing "gnupg" "gpg"
+        install_apt_pkg_if_missing "lsb-release" "lsb_release"
         if ! command -v docker >/dev/null 2>&1; then
           if [[ -n "${SUDO}" ]]; then
             $SUDO install -m 0755 -d /etc/apt/keyrings
@@ -161,7 +189,10 @@ install_linux() {
         ;;
       gcloud|google-cloud)
         if ! command -v gcloud >/dev/null 2>&1; then
-          install_pkg apt-transport-https ca-certificates gnupg curl
+          install_apt_pkg_if_missing "apt-transport-https" "apt"
+          install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
+          install_apt_pkg_if_missing "gnupg" "gpg"
+          install_apt_pkg_if_missing "curl" "curl"
           curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | $SUDO tee /etc/apt/sources.list.d/google-cloud-sdk.list >/dev/null
           $SUDO apt-get update
@@ -171,7 +202,8 @@ install_linux() {
         ;;
       aws|awscli)
         if ! command -v aws >/dev/null 2>&1; then
-          install_pkg unzip curl
+          install_apt_pkg_if_missing "unzip" "unzip"
+          install_apt_pkg_if_missing "curl" "curl"
           $SUDO apt-get install -y awscli
         fi
         configure_aws_completion
@@ -198,37 +230,40 @@ install_linux() {
         configure_doctl_completion
         ;;
       curl)
-        install_pkg curl
+        install_apt_pkg_if_missing "curl" "curl"
         ;;
       unzip)
-        install_pkg unzip
+        install_apt_pkg_if_missing "unzip" "unzip"
         ;;
       wget)
-        install_pkg wget
+        install_apt_pkg_if_missing "wget" "wget"
         ;;
       python3)
-        install_pkg python3
+        install_apt_pkg_if_missing "python3" "python3"
         ;;
       postgres)
-        install_pkg postgresql postgresql-contrib
+        install_apt_pkg_if_missing "postgresql" "pg_ctl"
+        install_apt_pkg_if_missing "postgresql-contrib" "psql"
         if command -v pg_ctl >/dev/null 2>&1; then
           echo "Postgres installed. Start it with: sudo service postgresql start"
         fi
         ;;
       redis)
-        install_pkg redis-server
+        install_apt_pkg_if_missing "redis-server" "redis-server"
         if command -v redis-server >/dev/null 2>&1; then
           echo "Redis installed. Start it with: sudo service redis-server start"
         fi
         ;;
       mysql)
-        install_pkg mysql-server
+        install_apt_pkg_if_missing "mysql-server" "mysqld"
         if command -v mysqld >/dev/null 2>&1; then
           echo "MySQL installed. Start it with: sudo service mysql start"
         fi
         ;;
       clickhouse)
-        install_pkg apt-transport-https ca-certificates gnupg
+        install_apt_pkg_if_missing "apt-transport-https" "apt"
+        install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
+        install_apt_pkg_if_missing "gnupg" "gpg"
         if ! command -v clickhouse-server >/dev/null 2>&1; then
           echo "deb https://packages.clickhouse.com/deb stable main" | $SUDO tee /etc/apt/sources.list.d/clickhouse.list >/dev/null
           curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | gpg --dearmor | $SUDO tee /etc/apt/trusted.gpg.d/clickhouse.gpg >/dev/null
@@ -238,7 +273,8 @@ install_linux() {
         echo "ClickHouse installed. Start it with: sudo service clickhouse-server start"
         ;;
       mongodb)
-        install_pkg gnupg curl
+        install_apt_pkg_if_missing "gnupg" "gpg"
+        install_apt_pkg_if_missing "curl" "curl"
         if ! command -v mongod >/dev/null 2>&1; then
           curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | $SUDO gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
           echo "deb [ arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(. /etc/os-release; echo "$VERSION_CODENAME")/mongodb-org/7.0 multiverse" | $SUDO tee /etc/apt/sources.list.d/mongodb-org-7.0.list >/dev/null
@@ -248,7 +284,8 @@ install_linux() {
         echo "MongoDB installed. Start it with: sudo systemctl start mongod"
         ;;
       rabbitmq)
-        install_pkg curl gnupg
+        install_apt_pkg_if_missing "curl" "curl"
+        install_apt_pkg_if_missing "gnupg" "gpg"
         if ! command -v rabbitmq-server >/dev/null 2>&1; then
           curl -fsSL https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | $SUDO gpg --dearmor -o /usr/share/keyrings/rabbitmq.gpg
           echo "deb [signed-by=/usr/share/keyrings/rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ $(. /etc/os-release; echo "$VERSION_CODENAME") main" | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
@@ -258,7 +295,8 @@ install_linux() {
         echo "RabbitMQ installed. Start it with: sudo systemctl start rabbitmq-server"
         ;;
       elasticsearch)
-        install_pkg gnupg curl
+        install_apt_pkg_if_missing "gnupg" "gpg"
+        install_apt_pkg_if_missing "curl" "curl"
         if ! command -v elasticsearch >/dev/null 2>&1; then
           wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | $SUDO gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | $SUDO tee /etc/apt/sources.list.d/elastic-8.x.list >/dev/null
@@ -268,7 +306,8 @@ install_linux() {
         echo "Elasticsearch installed. Start it with: sudo systemctl start elasticsearch"
         ;;
       kafka)
-        install_pkg curl ca-certificates
+        install_apt_pkg_if_missing "curl" "curl"
+        install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
         if ! command -v kafka-server-start >/dev/null 2>&1; then
           $SUDO apt-get install -y openjdk-17-jre-headless
           curl -fsSL https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz -o /tmp/kafka.tgz
@@ -282,4 +321,10 @@ install_linux() {
         ;;
     esac
   done
+
+  if (( LINUX_SKIPPED_COUNT > 0 )); then
+    echo "Summary: $LINUX_SKIPPED_COUNT package(s) were already installed; no reinstall attempted."
+  else
+    echo "Summary: all requested packages were installed or configured."
+  fi
 }

@@ -1,7 +1,42 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+install_brew_formula_if_missing() {
+  local formula_name="$1"
+  local binary_name="${2:-$formula_name}"
+
+  if brew list --versions "$formula_name" >/dev/null 2>&1; then
+    BREW_SKIPPED_COUNT=$((BREW_SKIPPED_COUNT + 1))
+    return 0
+  fi
+
+  if command -v "$binary_name" >/dev/null 2>&1; then
+    BREW_SKIPPED_COUNT=$((BREW_SKIPPED_COUNT + 1))
+    return 0
+  fi
+
+  brew install "$formula_name"
+}
+
+install_brew_cask_if_missing() {
+  local cask_name="$1"
+  local app_path="${2:-}"
+
+  if brew list --cask --versions "$cask_name" >/dev/null 2>&1; then
+    BREW_SKIPPED_COUNT=$((BREW_SKIPPED_COUNT + 1))
+    return 0
+  fi
+
+  if [[ -n "$app_path" ]] && [[ -e "$app_path" ]]; then
+    BREW_SKIPPED_COUNT=$((BREW_SKIPPED_COUNT + 1))
+    return 0
+  fi
+
+  brew install --cask "$cask_name"
+}
+
 install_mac() {
+  BREW_SKIPPED_COUNT=0
   echo "Detected macOS"
 
   if ! command -v brew >/dev/null 2>&1; then
@@ -17,22 +52,23 @@ install_mac() {
   for pkg in "$@"; do
     case "$pkg" in
       git)
-        brew install git bash-completion
+        install_brew_formula_if_missing "git"
+        install_brew_formula_if_missing "bash-completion"
         configure_git_completion
         ;;
       gpg)
-        brew install gnupg
+        install_brew_formula_if_missing "gnupg"
         ;;
       helm)
-        brew install helm
+        install_brew_formula_if_missing "helm"
         configure_helm_completion
         ;;
       kubectl)
-        brew install kubectl
+        install_brew_formula_if_missing "kubectl"
         configure_kubectl_completion
         ;;
       kubernetes-cli)
-        brew install kubectl
+        install_brew_formula_if_missing "kubectl"
         configure_kubectl_completion
         ;;
       docker)
@@ -41,26 +77,26 @@ install_mac() {
         configure_docker_completion
         ;;
       gcloud|google-cloud)
-        brew install --cask google-cloud-sdk
+        install_brew_cask_if_missing "google-cloud-sdk"
         configure_gcloud_completion
         ;;
       aws|awscli)
-        brew install awscli
+        install_brew_formula_if_missing "awscli" "aws"
         configure_aws_completion
         ;;
       eksctl)
-        brew install eksctl
+        install_brew_formula_if_missing "eksctl"
         ;;
       az|azure|azure-cli)
-        brew install azure-cli
+        install_brew_formula_if_missing "azure-cli" "az"
         configure_az_completion
         ;;
       doctl|digitalocean|doks)
-        brew install doctl
+        install_brew_formula_if_missing "doctl"
         configure_doctl_completion
         ;;
       golang)
-        brew install go
+        install_brew_formula_if_missing "go"
         ;;
       nvm)
         echo "Installing nvm..."
@@ -91,56 +127,56 @@ install_mac() {
         fi
         ;;
       dotnetcore)
-        brew install --cask dotnet-sdk
+        install_brew_cask_if_missing "dotnet-sdk"
         ;;
       dotnet)
-        brew install --cask dotnet-sdk
+        install_brew_cask_if_missing "dotnet-sdk"
         ;;
       vscode|code)
-        brew install --cask visual-studio-code
+        install_brew_cask_if_missing "visual-studio-code" "/Applications/Visual Studio Code.app"
         ;;
       curl)
         echo "curl is already included with macOS."
         ;;
       unzip)
-        brew install unzip
+        install_brew_formula_if_missing "unzip"
         ;;
       wget)
-        brew install wget
+        install_brew_formula_if_missing "wget"
         ;;
       python3)
-        brew install python
+        install_brew_formula_if_missing "python"
         ;;
       postgres)
-        brew install postgresql@16
+        install_brew_formula_if_missing "postgresql@16"
         echo "Postgres installed. Start it with: brew services start postgresql@16"
         ;;
       redis)
-        brew install redis
+        install_brew_formula_if_missing "redis"
         echo "Redis installed. Start it with: brew services start redis"
         ;;
       mysql)
-        brew install mysql
+        install_brew_formula_if_missing "mysql"
         echo "MySQL installed. Start it with: brew services start mysql"
         ;;
       clickhouse)
-        brew install clickhouse
+        install_brew_formula_if_missing "clickhouse"
         echo "ClickHouse installed. Start it with: clickhouse local or brew services start clickhouse"
         ;;
       mongodb)
-        brew install mongodb-community
+        install_brew_formula_if_missing "mongodb-community"
         echo "MongoDB installed. Start it with: brew services start mongodb-community"
         ;;
       rabbitmq)
-        brew install rabbitmq
+        install_brew_formula_if_missing "rabbitmq"
         echo "RabbitMQ installed. Start it with: brew services start rabbitmq"
         ;;
       elasticsearch)
-        brew install elasticsearch
+        install_brew_formula_if_missing "elasticsearch"
         echo "Elasticsearch installed. Start it with: brew services start elasticsearch"
         ;;
       kafka)
-        brew install kafka
+        install_brew_formula_if_missing "kafka"
         echo "Kafka installed. Start it with: brew services start kafka"
         ;;
       *)
@@ -148,4 +184,10 @@ install_mac() {
         ;;
     esac
   done
+
+  if (( BREW_SKIPPED_COUNT > 0 )); then
+    echo "Summary: $BREW_SKIPPED_COUNT package(s) were already installed; no reinstall attempted."
+  else
+    echo "Summary: all requested packages were installed or configured."
+  fi
 }
