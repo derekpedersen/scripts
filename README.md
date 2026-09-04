@@ -6,6 +6,7 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 
 - [bash](bash) for shell helper functions and aliases
 - [tools](tools) for OS-aware developer tool installation
+- [services](services) for isolated local Docker Compose service stacks
 - [helm](helm) for Helm chart version stamping helpers
 - [Jenkinsfile](Jenkinsfile) for CI validation of script syntax and installer smoke checks
 
@@ -30,6 +31,12 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 - [tools/common.sh](tools/common.sh): bundle definitions and identity helpers (git, gpg, ssh)
 - [tools/macos.sh](tools/macos.sh): macOS installation logic
 - [tools/linux.sh](tools/linux.sh): Debian-based Linux installation logic
+
+### Local services
+
+- [services/docker-compose.yml](services/docker-compose.yml): isolated local stack for PostgreSQL, Redis, RabbitMQ, and MongoDB
+- [services/local-dev.sh](services/local-dev.sh): interactive preset-based launcher for starting and stopping the local stack
+- [services/README.md](services/README.md): stack usage notes and port references
 
 ### Helm
 
