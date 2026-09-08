@@ -92,6 +92,24 @@ Optional override for testing another branch or fork during bootstrap:
 SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools/install.sh | bash -s -- default
 ```
 
+### Uninstall Bash helpers
+
+```bash
+bash ./bash/uninstall.sh
+```
+
+This removes the managed source block from your shell profile and deletes the generated helper file (`~/.scripts-bash-helpers`).
+
+### Uninstall developer tools
+
+```bash
+bash ./tools/uninstall.sh default
+bash ./tools/uninstall.sh kubectl docker
+bash ./tools/uninstall.sh services --dry-run
+```
+
+The uninstall flow mirrors the install pattern: it is explicit, target-based, and safe by default.
+
 ## Tool installer bundles
 
 - default: core developer setup
