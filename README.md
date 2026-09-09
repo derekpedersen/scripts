@@ -81,6 +81,16 @@ From this repo:
 bash ./tools/install.sh default
 ```
 
+Native Windows 11+ support is included. Use either Git Bash/MSYS, PowerShell with the bundled wrapper, or WSL/Linux paths as appropriate:
+
+```powershell
+pwsh ./tools/install.ps1 default
+```
+
+```bash
+bash ./tools/install.sh default
+```
+
 One-liner from GitHub (replace default with full, dev, services, or cloud):
 
 ```bash
@@ -107,6 +117,13 @@ This removes the managed source block from your shell profile and deletes the ge
 bash ./tools/uninstall.sh default
 bash ./tools/uninstall.sh kubectl docker
 bash ./tools/uninstall.sh services --dry-run
+```
+
+Windows examples:
+
+```powershell
+pwsh ./tools/uninstall.ps1 default
+pwsh ./tools/uninstall.ps1 docker vscode --dry-run
 ```
 
 The uninstall flow mirrors the install pattern: it is explicit, target-based, and safe by default.

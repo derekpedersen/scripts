@@ -16,12 +16,31 @@ set -euo pipefail
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
-if [[ ! -f "$SCRIPT_DIR/common.sh" ]]; then
-  echo "Required installer file missing: $SCRIPT_DIR/common.sh"
+if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/windows.sh" ]]; then
+  echo "Required installer files missing: $SCRIPT_DIR/common.sh and $SCRIPT_DIR/windows.sh"
   exit 1
 fi
 
 source "$SCRIPT_DIR/common.sh"
+
+OS="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
+case "$OS" in
+  Darwin|Linux)
+    PLATFORM="unix"
+    ;;
+  MINGW*|MSYS*|CYGWIN*|Windows_NT)
+    source "$SCRIPT_DIR/windows.sh"
+    PLATFORM="windows"
+    ;;
+  *)
+    if [[ -n "${WSL_DISTRO_NAME:-}" || "$(uname -r 2>/dev/null || true)" == *Microsoft* ]]; then
+      PLATFORM="unix"
+    else
+      echo "Unsupported OS: $OS"
+      exit 1
+    fi
+    ;;
+esac
 
 usage() {
   cat <<'EOF'
@@ -198,22 +217,46 @@ uninstall_tool() {
 
   case "$tool" in
     git)
-      remove_apt_package "git" "git"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "git" "git"
+      fi
       ;;
     gpg)
-      remove_apt_package "gnupg" "gpg"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "gnupg" "gpg"
+      fi
       ;;
     curl)
-      remove_apt_package "curl" "curl"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "curl" "curl"
+      fi
       ;;
     wget)
-      remove_apt_package "wget" "wget"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "wget" "wget"
+      fi
       ;;
     unzip)
-      remove_apt_package "unzip" "unzip"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "unzip" "unzip"
+      fi
       ;;
     python3)
-      remove_apt_package "python3" "python3"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "python3" "python3"
+      fi
       ;;
     git-config)
       if [[ "$DRY_RUN" == true ]]; then
@@ -246,111 +289,199 @@ uninstall_tool() {
       fi
       ;;
     nvm)
-      if [[ "$DRY_RUN" == true ]]; then
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      elif [[ "$DRY_RUN" == true ]]; then
         echo "DRY RUN: would remove $HOME/.nvm"
       else
         rm -rf "$HOME/.nvm"
       fi
       ;;
     node)
-      if [[ "$DRY_RUN" == true ]]; then
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      elif [[ "$DRY_RUN" == true ]]; then
         echo "DRY RUN: would remove node and nvm-managed Node installs"
       else
         rm -rf "$HOME/.nvm"
       fi
       ;;
     golang)
-      remove_binary "go"
-      if [[ -d "/usr/local/go" ]]; then
-        if [[ "$DRY_RUN" == true ]]; then
-          echo "DRY RUN: would remove /usr/local/go"
-        else
-          rm -rf /usr/local/go
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_binary "go"
+        if [[ -d "/usr/local/go" ]]; then
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "DRY RUN: would remove /usr/local/go"
+          else
+            rm -rf /usr/local/go
+          fi
         fi
       fi
       ;;
     helm)
-      remove_binary "helm"
-      if [[ -f "/usr/local/bin/helm" ]]; then
-        if [[ "$DRY_RUN" == true ]]; then
-          echo "DRY RUN: would remove /usr/local/bin/helm"
-        else
-          rm -f /usr/local/bin/helm
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_binary "helm"
+        if [[ -f "/usr/local/bin/helm" ]]; then
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "DRY RUN: would remove /usr/local/bin/helm"
+          else
+            rm -f /usr/local/bin/helm
+          fi
         fi
       fi
       ;;
     kubectl|kubernetes-cli)
-      remove_binary "kubectl"
-      if [[ -f "/usr/local/bin/kubectl" ]]; then
-        if [[ "$DRY_RUN" == true ]]; then
-          echo "DRY RUN: would remove /usr/local/bin/kubectl"
-        else
-          rm -f /usr/local/bin/kubectl
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_binary "kubectl"
+        if [[ -f "/usr/local/bin/kubectl" ]]; then
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "DRY RUN: would remove /usr/local/bin/kubectl"
+          else
+            rm -f /usr/local/bin/kubectl
+          fi
         fi
       fi
       ;;
     docker)
-      remove_apt_package "docker-ce" "docker"
-      remove_apt_package "docker-ce-cli" "docker"
-      remove_apt_package "containerd.io" "containerd"
-      remove_apt_package "docker-buildx-plugin" "docker-buildx"
-      remove_apt_package "docker-compose-plugin" "docker-compose"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "docker-ce" "docker"
+        remove_apt_package "docker-ce-cli" "docker"
+        remove_apt_package "containerd.io" "containerd"
+        remove_apt_package "docker-buildx-plugin" "docker-buildx"
+        remove_apt_package "docker-compose-plugin" "docker-compose"
+      fi
       ;;
     dotnetcore|dotnet)
-      remove_apt_package "dotnet-sdk-8.0" "dotnet"
-      remove_binary "dotnet"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "dotnet-sdk-8.0" "dotnet"
+        remove_binary "dotnet"
+      fi
       ;;
     vscode|code)
-      remove_apt_package "code" "code"
-      remove_binary "code"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "code" "code"
+        remove_binary "code"
+      fi
       ;;
     gcloud|google-cloud)
-      remove_apt_package "google-cloud-cli" "gcloud"
-      remove_binary "gcloud"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "google-cloud-cli" "gcloud"
+        remove_binary "gcloud"
+      fi
       ;;
     aws|awscli)
-      remove_apt_package "awscli" "aws"
-      remove_binary "aws"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "awscli" "aws"
+        remove_binary "aws"
+      fi
       ;;
     eksctl)
-      remove_binary "eksctl"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_binary "eksctl"
+      fi
       ;;
     az|azure|azure-cli)
-      remove_apt_package "azure-cli" "az"
-      remove_binary "az"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "azure-cli" "az"
+        remove_binary "az"
+      fi
       ;;
     doctl|digitalocean|doks)
-      remove_binary "doctl"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_binary "doctl"
+      fi
       ;;
     jq)
-      remove_apt_package "jq" "jq"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "jq" "jq"
+      fi
       ;;
     yq)
-      remove_binary "yq"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_binary "yq"
+      fi
       ;;
     postgres)
-      remove_apt_package "postgresql" "psql"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "postgresql" "psql"
+      fi
       ;;
     redis)
-      remove_apt_package "redis-server" "redis-server"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "redis-server" "redis-server"
+      fi
       ;;
     mysql)
-      remove_apt_package "mysql-server" "mysqld"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "mysql-server" "mysqld"
+      fi
       ;;
     clickhouse)
-      remove_apt_package "clickhouse-server" "clickhouse-server"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "clickhouse-server" "clickhouse-server"
+      fi
       ;;
     mongodb)
-      remove_apt_package "mongodb-org" "mongod"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "mongodb-org" "mongod"
+      fi
       ;;
     rabbitmq)
-      remove_apt_package "rabbitmq-server" "rabbitmq-server"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "rabbitmq-server" "rabbitmq-server"
+      fi
       ;;
     elasticsearch)
-      remove_apt_package "elasticsearch" "elasticsearch"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "elasticsearch" "elasticsearch"
+      fi
       ;;
     kafka)
-      remove_apt_package "kafka" "kafka"
+      if [[ "$PLATFORM" == "windows" ]]; then
+        uninstall_windows "$tool"
+      else
+        remove_apt_package "kafka" "kafka"
+      fi
       ;;
     *)
       echo "Unsupported tool: $tool"

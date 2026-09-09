@@ -50,7 +50,7 @@ bootstrap_from_github() {
 # BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 
-if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/macos.sh" || ! -f "$SCRIPT_DIR/linux.sh" ]]; then
+if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/macos.sh" || ! -f "$SCRIPT_DIR/linux.sh" || ! -f "$SCRIPT_DIR/windows.sh" ]]; then
   if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
     echo "Required installer files are missing from $SCRIPT_DIR and bootstrap already ran."
     exit 1
@@ -62,7 +62,7 @@ fi
 
 source "$SCRIPT_DIR/common.sh"
 
-OS="$(uname -s)"
+OS="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
 case "$OS" in
   Darwin)
     source "$SCRIPT_DIR/macos.sh"
@@ -72,9 +72,18 @@ case "$OS" in
     source "$SCRIPT_DIR/linux.sh"
     PLATFORM="linux"
     ;;
+  MINGW*|MSYS*|CYGWIN*|Windows_NT)
+    source "$SCRIPT_DIR/windows.sh"
+    PLATFORM="windows"
+    ;;
   *)
-    echo "Unsupported OS: $OS"
-    exit 1
+    if [[ -n "${WSL_DISTRO_NAME:-}" || "$(uname -r 2>/dev/null || true)" == *Microsoft* ]]; then
+      source "$SCRIPT_DIR/linux.sh"
+      PLATFORM="linux"
+    else
+      echo "Unsupported OS: $OS"
+      exit 1
+    fi
     ;;
 esac
 
@@ -239,6 +248,8 @@ fi
 
 if [[ "$PLATFORM" == "mac" ]]; then
   install_mac "${args[@]}"
+elif [[ "$PLATFORM" == "windows" ]]; then
+  install_windows "${args[@]}"
 else
   install_linux "${args[@]}"
 fi
