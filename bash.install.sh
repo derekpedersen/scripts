@@ -27,13 +27,13 @@ bootstrap_from_github() {
   tar -xzf "$archive" -C "$tmpdir"
 
   extracted_dir="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
-  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/bash/install.sh" ]]; then
-    echo "Bootstrap failed: could not find bash/install.sh in downloaded archive."
+  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/bash.install.sh" ]]; then
+    echo "Bootstrap failed: could not find bash.install.sh in downloaded archive."
     rm -rf "$tmpdir"
     return 1
   fi
 
-  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/bash/install.sh" "$@"
+  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/bash.install.sh" "$@"
   rc=$?
   rm -rf "$tmpdir"
   return $rc
@@ -234,7 +234,7 @@ selected_list="${selected_files[*]}"
 HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
 
 {
-  echo "# Managed by scripts/bash/install.sh. Do not edit directly."
+  echo "# Managed by scripts/bash.install.sh. Do not edit directly."
   echo "# Rerun the installer to update: https://github.com/derekpedersen/scripts"
   echo "# selected: $selected_list"
   echo

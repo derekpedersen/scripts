@@ -11,7 +11,7 @@ This repository contains bash helper modules, local developer install scripts, a
 - Treat destructive tooling as opt-in and confirm before deletion or cleanup.
 
 ## File layout
-- `bash/`: helper installer entrypoints and docs
+- `bash.install.sh` / `bash.uninstall.sh` / `bash.README.md`: root-level Bash helper entrypoints and docs
 - `tools/`: installer controllers and shared runtime/helpers
 - `<tool>/`: per-tool modules at repo root containing `install.sh`, `uninstall.sh`, optional `install.windows.ps1`, and optional `bash.sh`
 - `helm/`: Helm-related helper scripts

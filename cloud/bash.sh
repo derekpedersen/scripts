@@ -10,14 +10,14 @@
 #
 # Notes:
 #   This file is intentionally lightweight; the cloud-specific helper
-#   files are sourced separately by bash/install.sh.
+#   files are sourced separately by bash.install.sh.
 # ============================================================
 
 if command -v aws >/dev/null 2>&1; then
   :
 fi
 
-# The individual files are auto-sourced by bash/install.sh when enabled.
+# The individual files are auto-sourced by bash.install.sh when enabled.
 # This file intentionally keeps the cloud-related shortcuts grouped together.
 
 cloud-status() {

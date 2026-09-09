@@ -22,19 +22,19 @@ The preferred method is to install the auto-loader into your shell profile. This
 From this repo, run:
 
 ```bash
-bash ./bash/install.sh
+bash ./bash.install.sh
 ```
 
 Or install directly from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash.install.sh | bash
 ```
 
 To test another branch or fork during bootstrap:
 
 ```bash
-SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash.install.sh | bash
 ```
 
 The installer is interactive and module-aware. It scans repo-root modules for `bash.sh` files and asks which ones you want enabled, such as:

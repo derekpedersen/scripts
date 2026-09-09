@@ -8,4 +8,4 @@ Module for cloud-related tooling and shell helpers.
 
 ## Usage
 
-This is a helper-only module. Load it via bash/install.sh selection.
+This is a helper-only module. Load it via bash.install.sh selection.

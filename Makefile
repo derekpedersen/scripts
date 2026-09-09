@@ -9,10 +9,11 @@ all: build test
 
 build:
 	@bash -lc 'set -euo pipefail; \
-		test -d bash; \
+		test -f bash.install.sh; \
+		test -f bash.uninstall.sh; \
 		test -d tools; \
 		test -d helm; \
-		for f in bash/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
+		for f in bash.*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
 		for f in tools/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
 		for f in */install.sh */uninstall.sh */bash.sh; do if [[ -f "$$f" ]]; then echo "  - $$f"; bash -n "$$f"; fi; done; \
 		for f in helm/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \

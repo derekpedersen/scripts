@@ -10,7 +10,7 @@
 #
 # Notes:
 #   Keep functions shell-safe, readable, and idempotent. Source this
-#   file via bash/install.sh when you want it loaded in your shell.
+#   file via bash.install.sh when you want it loaded in your shell.
 # ============================================================
 
 aws-current-profile() {

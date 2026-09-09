@@ -4,7 +4,7 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 
 ## What this repo contains
 
-- [bash](bash) for shell helper functions and aliases
+- [bash.README.md](bash.README.md) for shell helper usage and conventions
 - [tools](tools) for OS-aware developer tool installation
 - [services](services) for isolated local Docker Compose service stacks
 - [helm](helm) for Helm chart version stamping helpers
@@ -15,8 +15,9 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 
 ### Bash helpers
 
-- [bash/install.sh](bash/install.sh): interactive helper loader that writes a managed source block to your shell profile
-- [bash/README.md](bash/README.md): detailed helper documentation
+- [bash.install.sh](bash.install.sh): interactive helper loader that writes a managed source block to your shell profile
+- [bash.uninstall.sh](bash.uninstall.sh): managed helper uninstaller
+- [bash.README.md](bash.README.md): detailed helper documentation
 - [git/bash.sh](git/bash.sh): git workflow and cleanup helpers
 - [docker/bash.sh](docker/bash.sh): Docker and cleanup helpers
 - [kubectl/bash.sh](kubectl/bash.sh): kubectl and troubleshooting helpers
@@ -56,13 +57,13 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 From this repo:
 
 ```bash
-bash ./bash/install.sh
+bash ./bash.install.sh
 ```
 
 One-liner from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash.install.sh | bash
 ```
 
 The installer concatenates the selected helper files into a single managed file (`~/.scripts-bash-helpers`) and sources it from your shell profile. The profile only references that stable file, so helpers keep working even if the repo clone or bootstrap temp directory is removed. Rerun the installer to update the helpers.
@@ -70,8 +71,8 @@ The installer concatenates the selected helper files into a single managed file 
 Optional overrides for testing another branch or fork, or changing the managed helpers file:
 
 ```bash
-SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
-SCRIPTS_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash.install.sh | bash
+SCRIPTS_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash.install.sh | bash
 ```
 
 ### Install developer tools
@@ -107,7 +108,7 @@ SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL http
 ### Uninstall Bash helpers
 
 ```bash
-bash ./bash/uninstall.sh
+bash ./bash.uninstall.sh
 ```
 
 This removes the managed source block from your shell profile and deletes the generated helper file (`~/.scripts-bash-helpers`).
