@@ -18,11 +18,11 @@ Accepted alias names: google-cloud
 From repo root:
 
 ```bash
-bash ./tools/install.sh gcloud
+bash ./tools.install.sh gcloud
 ```
 
 ```bash
-bash ./tools/uninstall.sh gcloud
+bash ./tools.uninstall.sh gcloud
 ```
 
 PowerShell (Windows):

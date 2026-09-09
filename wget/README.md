@@ -13,11 +13,11 @@ Module for wget-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh wget
+bash ./tools.install.sh wget
 ```
 
 ```bash
-bash ./tools/uninstall.sh wget
+bash ./tools.uninstall.sh wget
 ```
 
 PowerShell (Windows):

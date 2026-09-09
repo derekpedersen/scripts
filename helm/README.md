@@ -13,11 +13,11 @@ Module for helm-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh helm
+bash ./tools.install.sh helm
 ```
 
 ```bash
-bash ./tools/uninstall.sh helm
+bash ./tools.uninstall.sh helm
 ```
 
 PowerShell (Windows):

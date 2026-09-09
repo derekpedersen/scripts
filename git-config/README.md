@@ -13,11 +13,11 @@ Module for git-config-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh git-config
+bash ./tools.install.sh git-config
 ```
 
 ```bash
-bash ./tools/uninstall.sh git-config
+bash ./tools.uninstall.sh git-config
 ```
 
 PowerShell (Windows):

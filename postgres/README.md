@@ -13,11 +13,11 @@ Module for postgres-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh postgres
+bash ./tools.install.sh postgres
 ```
 
 ```bash
-bash ./tools/uninstall.sh postgres
+bash ./tools.uninstall.sh postgres
 ```
 
 PowerShell (Windows):

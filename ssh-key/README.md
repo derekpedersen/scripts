@@ -13,11 +13,11 @@ Module for ssh-key-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh ssh-key
+bash ./tools.install.sh ssh-key
 ```
 
 ```bash
-bash ./tools/uninstall.sh ssh-key
+bash ./tools.uninstall.sh ssh-key
 ```
 
 PowerShell (Windows):

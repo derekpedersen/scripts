@@ -13,11 +13,11 @@ Module for identity-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh identity
+bash ./tools.install.sh identity
 ```
 
 ```bash
-bash ./tools/uninstall.sh identity
+bash ./tools.uninstall.sh identity
 ```
 
 PowerShell (Windows):

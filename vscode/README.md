@@ -17,11 +17,11 @@ Accepted alias names: code
 From repo root:
 
 ```bash
-bash ./tools/install.sh vscode
+bash ./tools.install.sh vscode
 ```
 
 ```bash
-bash ./tools/uninstall.sh vscode
+bash ./tools.uninstall.sh vscode
 ```
 
 PowerShell (Windows):

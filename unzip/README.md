@@ -13,11 +13,11 @@ Module for unzip-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh unzip
+bash ./tools.install.sh unzip
 ```
 
 ```bash
-bash ./tools/uninstall.sh unzip
+bash ./tools.uninstall.sh unzip
 ```
 
 PowerShell (Windows):

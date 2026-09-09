@@ -18,11 +18,11 @@ Accepted alias names: kubernetes-cli
 From repo root:
 
 ```bash
-bash ./tools/install.sh kubectl
+bash ./tools.install.sh kubectl
 ```
 
 ```bash
-bash ./tools/uninstall.sh kubectl
+bash ./tools.uninstall.sh kubectl
 ```
 
 PowerShell (Windows):

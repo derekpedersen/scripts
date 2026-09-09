@@ -13,11 +13,11 @@ Module for mongodb-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh mongodb
+bash ./tools.install.sh mongodb
 ```
 
 ```bash
-bash ./tools/uninstall.sh mongodb
+bash ./tools.uninstall.sh mongodb
 ```
 
 PowerShell (Windows):

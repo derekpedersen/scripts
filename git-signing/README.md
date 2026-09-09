@@ -13,11 +13,11 @@ Module for git-signing-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh git-signing
+bash ./tools.install.sh git-signing
 ```
 
 ```bash
-bash ./tools/uninstall.sh git-signing
+bash ./tools.uninstall.sh git-signing
 ```
 
 PowerShell (Windows):

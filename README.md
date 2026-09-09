@@ -29,9 +29,9 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 
 ### Tool installer
 
-- [tools/install.sh](tools/install.sh): main installer controller
-- [tools/common.sh](tools/common.sh): bundle definitions, aliases, and identity helpers (git, gpg, ssh)
-- [tools/module-runtime.sh](tools/module-runtime.sh): shared module dispatcher runtime used by per-tool installers
+- [tools.install.sh](tools.install.sh): main installer controller
+- [tools.common.sh](tools.common.sh): bundle definitions, aliases, and identity helpers (git, gpg, ssh)
+- [tools.module-runtime.sh](tools.module-runtime.sh): shared module dispatcher runtime used by per-tool installers
 - [git/install.sh](git/install.sh): example per-tool installer module
 - [git/install.windows.ps1](git/install.windows.ps1): example Windows wrapper for a module install
 
@@ -80,29 +80,29 @@ SCRIPTS_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.com/
 From this repo:
 
 ```bash
-bash ./tools/install.sh default
+bash ./tools.install.sh default
 ```
 
 Native Windows 11+ support is included. Use either Git Bash/MSYS, PowerShell with the bundled wrapper, or WSL/Linux paths as appropriate:
 
 ```powershell
-pwsh ./tools/install.ps1 default
+pwsh ./tools.install.ps1 default
 ```
 
 ```bash
-bash ./tools/install.sh default
+bash ./tools.install.sh default
 ```
 
 One-liner from GitHub (replace default with full, dev, services, or cloud):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools/install.sh | bash -s -- default
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools.install.sh | bash -s -- default
 ```
 
 Optional override for testing another branch or fork during bootstrap:
 
 ```bash
-SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools/install.sh | bash -s -- default
+SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools.install.sh | bash -s -- default
 ```
 
 ### Uninstall Bash helpers
@@ -116,16 +116,16 @@ This removes the managed source block from your shell profile and deletes the ge
 ### Uninstall developer tools
 
 ```bash
-bash ./tools/uninstall.sh default
-bash ./tools/uninstall.sh kubectl docker
-bash ./tools/uninstall.sh services --dry-run
+bash ./tools.uninstall.sh default
+bash ./tools.uninstall.sh kubectl docker
+bash ./tools.uninstall.sh services --dry-run
 ```
 
 Windows examples:
 
 ```powershell
-pwsh ./tools/uninstall.ps1 default
-pwsh ./tools/uninstall.ps1 docker vscode --dry-run
+pwsh ./tools.uninstall.ps1 default
+pwsh ./tools.uninstall.ps1 docker vscode --dry-run
 ```
 
 The uninstall flow mirrors the install pattern: it is explicit, target-based, and safe by default.
@@ -141,26 +141,26 @@ The uninstall flow mirrors the install pattern: it is explicit, target-based, an
 Bundle quick examples:
 
 ```bash
-bash ./tools/install.sh default
-bash ./tools/install.sh full
-bash ./tools/install.sh dev
-bash ./tools/install.sh services
-bash ./tools/install.sh cloud
+bash ./tools.install.sh default
+bash ./tools.install.sh full
+bash ./tools.install.sh dev
+bash ./tools.install.sh services
+bash ./tools.install.sh cloud
 ```
 
 Dry run example:
 
 ```bash
-bash ./tools/install.sh full --dry-run
+bash ./tools.install.sh full --dry-run
 ```
 
 Identity setup examples:
 
 ```bash
-GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' bash ./tools/install.sh git-config
-GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' GPG_KEY_ID='ABC123DEF456' bash ./tools/install.sh gpg git-signing
-SSH_KEY_EMAIL='jane@example.com' bash ./tools/install.sh ssh-key
-bash ./tools/install.sh identity
+GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' bash ./tools.install.sh git-config
+GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' GPG_KEY_ID='ABC123DEF456' bash ./tools.install.sh gpg git-signing
+SSH_KEY_EMAIL='jane@example.com' bash ./tools.install.sh ssh-key
+bash ./tools.install.sh identity
 ```
 
 ## Supported tool names

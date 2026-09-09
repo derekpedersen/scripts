@@ -12,7 +12,9 @@ This repository contains bash helper modules, local developer install scripts, a
 
 ## File layout
 - `bash.install.sh` / `bash.uninstall.sh` / `bash.README.md`: root-level Bash helper entrypoints and docs
-- `tools/`: installer controllers and shared runtime/helpers
+- `tools.install.sh` / `tools.uninstall.sh` / `tools.README.md`: root-level tool installer entrypoints and docs
+- `tools.common.sh` / `tools.module-runtime.sh` / `tools.macos.sh` / `tools.linux.sh` / `tools.windows.sh`: shared installer runtime and platform logic
+- `tools.install.ps1` / `tools.uninstall.ps1`: PowerShell wrappers for Windows
 - `<tool>/`: per-tool modules at repo root containing `install.sh`, `uninstall.sh`, optional `install.windows.ps1`, and optional `bash.sh`
 - `helm/`: Helm-related helper scripts
 - `Makefile`: shared build and test entry points used by both local runs and Jenkins

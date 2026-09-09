@@ -13,11 +13,11 @@ Module for kafka-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh kafka
+bash ./tools.install.sh kafka
 ```
 
 ```bash
-bash ./tools/uninstall.sh kafka
+bash ./tools.uninstall.sh kafka
 ```
 
 PowerShell (Windows):

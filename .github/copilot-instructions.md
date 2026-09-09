@@ -46,9 +46,9 @@ docker-login() {
 
 ## File patterns
 - Bash helper module files go in repo-root tool folders as `<tool>/bash.sh`.
-- Installer entrypoints stay in `tools/` (`install.sh` and `uninstall.sh`) and dispatch to per-tool modules.
+- Tool installer entrypoints live at repo root as `tools.install.sh` and `tools.uninstall.sh` and dispatch to per-tool modules.
 - Bash helper entrypoints live at repo root as `bash.install.sh` and `bash.uninstall.sh`.
-- Keep bundle names stable in `tools/common.sh` and keep usage text in sync with `tools/install.sh`.
+- Keep bundle names stable in `tools.common.sh` and keep usage text in sync with `tools.install.sh`.
 - Prefer functions and aliases that are discoverable by name.
 
 ## Shell conventions

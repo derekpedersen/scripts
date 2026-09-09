@@ -13,11 +13,11 @@ Module for jq-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh jq
+bash ./tools.install.sh jq
 ```
 
 ```bash
-bash ./tools/uninstall.sh jq
+bash ./tools.uninstall.sh jq
 ```
 
 PowerShell (Windows):

@@ -18,11 +18,11 @@ Accepted alias names: awscli
 From repo root:
 
 ```bash
-bash ./tools/install.sh aws
+bash ./tools.install.sh aws
 ```
 
 ```bash
-bash ./tools/uninstall.sh aws
+bash ./tools.uninstall.sh aws
 ```
 
 PowerShell (Windows):

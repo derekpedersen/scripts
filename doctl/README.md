@@ -18,11 +18,11 @@ Accepted alias names: digitalocean, doks
 From repo root:
 
 ```bash
-bash ./tools/install.sh doctl
+bash ./tools.install.sh doctl
 ```
 
 ```bash
-bash ./tools/uninstall.sh doctl
+bash ./tools.uninstall.sh doctl
 ```
 
 PowerShell (Windows):

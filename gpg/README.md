@@ -13,11 +13,11 @@ Module for gpg-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh gpg
+bash ./tools.install.sh gpg
 ```
 
 ```bash
-bash ./tools/uninstall.sh gpg
+bash ./tools.uninstall.sh gpg
 ```
 
 PowerShell (Windows):

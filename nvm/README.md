@@ -13,11 +13,11 @@ Module for nvm-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh nvm
+bash ./tools.install.sh nvm
 ```
 
 ```bash
-bash ./tools/uninstall.sh nvm
+bash ./tools.uninstall.sh nvm
 ```
 
 PowerShell (Windows):

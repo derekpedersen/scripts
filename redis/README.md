@@ -13,11 +13,11 @@ Module for redis-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh redis
+bash ./tools.install.sh redis
 ```
 
 ```bash
-bash ./tools/uninstall.sh redis
+bash ./tools.uninstall.sh redis
 ```
 
 PowerShell (Windows):

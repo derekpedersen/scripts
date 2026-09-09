@@ -13,11 +13,11 @@ Module for curl-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh curl
+bash ./tools.install.sh curl
 ```
 
 ```bash
-bash ./tools/uninstall.sh curl
+bash ./tools.uninstall.sh curl
 ```
 
 PowerShell (Windows):

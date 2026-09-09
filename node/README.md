@@ -13,11 +13,11 @@ Module for node-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh node
+bash ./tools.install.sh node
 ```
 
 ```bash
-bash ./tools/uninstall.sh node
+bash ./tools.uninstall.sh node
 ```
 
 PowerShell (Windows):

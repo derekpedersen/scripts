@@ -13,11 +13,11 @@ Module for golang-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh golang
+bash ./tools.install.sh golang
 ```
 
 ```bash
-bash ./tools/uninstall.sh golang
+bash ./tools.uninstall.sh golang
 ```
 
 PowerShell (Windows):

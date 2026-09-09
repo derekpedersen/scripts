@@ -13,11 +13,11 @@ Module for eksctl-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh eksctl
+bash ./tools.install.sh eksctl
 ```
 
 ```bash
-bash ./tools/uninstall.sh eksctl
+bash ./tools.uninstall.sh eksctl
 ```
 
 PowerShell (Windows):

@@ -41,7 +41,7 @@ bootstrap_from_github() {
 
 # BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$SCRIPT_DIR"
 SHELL_NAME="${SHELL:-}"
 MARKER_BEGIN="# >>> scripts/bash helpers >>>"
 MARKER_END="# <<< scripts/bash helpers <<<"

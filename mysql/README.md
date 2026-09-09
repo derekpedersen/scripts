@@ -13,11 +13,11 @@ Module for mysql-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh mysql
+bash ./tools.install.sh mysql
 ```
 
 ```bash
-bash ./tools/uninstall.sh mysql
+bash ./tools.uninstall.sh mysql
 ```
 
 PowerShell (Windows):

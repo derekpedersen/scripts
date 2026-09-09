@@ -13,11 +13,11 @@ Module for clickhouse-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh clickhouse
+bash ./tools.install.sh clickhouse
 ```
 
 ```bash
-bash ./tools/uninstall.sh clickhouse
+bash ./tools.uninstall.sh clickhouse
 ```
 
 PowerShell (Windows):

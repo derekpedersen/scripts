@@ -11,39 +11,39 @@ set -euo pipefail
 #
 # Notes:
 #   This runtime keeps module scripts thin while preserving existing
-#   platform-specific behavior from tools/macos.sh, tools/linux.sh,
-#   and tools/windows.sh.
+#   platform-specific behavior from tools.macos.sh, tools.linux.sh,
+#   and tools.windows.sh.
 # ============================================================
 
 TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
-REPO_ROOT="$(cd "$TOOLS_DIR/.." && pwd)"
+REPO_ROOT="$TOOLS_DIR"
 
-if [[ ! -f "$TOOLS_DIR/common.sh" ]]; then
-  echo "Missing required helper: $TOOLS_DIR/common.sh"
+if [[ ! -f "$TOOLS_DIR/tools.common.sh" ]]; then
+  echo "Missing required helper: $TOOLS_DIR/tools.common.sh"
   exit 1
 fi
 
-source "$TOOLS_DIR/common.sh"
+source "$TOOLS_DIR/tools.common.sh"
 
 OS_NAME="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
 PLATFORM=""
 case "$OS_NAME" in
   Darwin)
     PLATFORM="mac"
-    source "$TOOLS_DIR/macos.sh"
+    source "$TOOLS_DIR/tools.macos.sh"
     ;;
   Linux)
     PLATFORM="linux"
-    source "$TOOLS_DIR/linux.sh"
+    source "$TOOLS_DIR/tools.linux.sh"
     ;;
   MINGW*|MSYS*|CYGWIN*|Windows_NT)
     PLATFORM="windows"
-    source "$TOOLS_DIR/windows.sh"
+    source "$TOOLS_DIR/tools.windows.sh"
     ;;
   *)
     if [[ -n "${WSL_DISTRO_NAME:-}" || "$(uname -r 2>/dev/null || true)" == *Microsoft* ]]; then
       PLATFORM="linux"
-      source "$TOOLS_DIR/linux.sh"
+      source "$TOOLS_DIR/tools.linux.sh"
     else
       echo "Unsupported OS: $OS_NAME"
       exit 1
@@ -83,7 +83,7 @@ module_install() {
       if [[ "${DRY_RUN:-false}" == true ]]; then
         echo "DRY RUN: would configure Git identity, GPG signing, and SSH key."
       else
-        configure_identity_interactive "$REPO_ROOT/tools/install.sh" || true
+        configure_identity_interactive "$REPO_ROOT/tools.install.sh" || true
       fi
       return 0
       ;;
@@ -111,10 +111,10 @@ module_uninstall() {
     return 0
   fi
 
-  if [[ -f "$REPO_ROOT/tools/uninstall.sh" ]]; then
-    TOOLS_UNINSTALL_MODULE_INTERNAL=1 bash "$REPO_ROOT/tools/uninstall.sh" "$tool"
+  if [[ -f "$REPO_ROOT/tools.uninstall.sh" ]]; then
+    TOOLS_UNINSTALL_MODULE_INTERNAL=1 bash "$REPO_ROOT/tools.uninstall.sh" "$tool"
   else
-    echo "Missing required script: $REPO_ROOT/tools/uninstall.sh"
+    echo "Missing required script: $REPO_ROOT/tools.uninstall.sh"
     return 1
   fi
 }

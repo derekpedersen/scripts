@@ -13,11 +13,11 @@ Module for python3-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh python3
+bash ./tools.install.sh python3
 ```
 
 ```bash
-bash ./tools/uninstall.sh python3
+bash ./tools.uninstall.sh python3
 ```
 
 PowerShell (Windows):

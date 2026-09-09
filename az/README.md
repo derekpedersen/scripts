@@ -18,11 +18,11 @@ Accepted alias names: azure, azure-cli
 From repo root:
 
 ```bash
-bash ./tools/install.sh az
+bash ./tools.install.sh az
 ```
 
 ```bash
-bash ./tools/uninstall.sh az
+bash ./tools.uninstall.sh az
 ```
 
 PowerShell (Windows):

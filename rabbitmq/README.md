@@ -13,11 +13,11 @@ Module for rabbitmq-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh rabbitmq
+bash ./tools.install.sh rabbitmq
 ```
 
 ```bash
-bash ./tools/uninstall.sh rabbitmq
+bash ./tools.uninstall.sh rabbitmq
 ```
 
 PowerShell (Windows):

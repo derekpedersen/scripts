@@ -14,11 +14,11 @@ Module for docker-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh docker
+bash ./tools.install.sh docker
 ```
 
 ```bash
-bash ./tools/uninstall.sh docker
+bash ./tools.uninstall.sh docker
 ```
 
 PowerShell (Windows):

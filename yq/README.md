@@ -13,11 +13,11 @@ Module for yq-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh yq
+bash ./tools.install.sh yq
 ```
 
 ```bash
-bash ./tools/uninstall.sh yq
+bash ./tools.uninstall.sh yq
 ```
 
 PowerShell (Windows):

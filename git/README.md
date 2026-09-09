@@ -14,11 +14,11 @@ Module for git-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh git
+bash ./tools.install.sh git
 ```
 
 ```bash
-bash ./tools/uninstall.sh git
+bash ./tools.uninstall.sh git
 ```
 
 PowerShell (Windows):

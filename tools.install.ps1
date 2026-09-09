@@ -1,10 +1,10 @@
 $ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$scriptPath = Join-Path $scriptDir 'uninstall.sh'
+$scriptPath = Join-Path $scriptDir 'tools.install.sh'
 
 if (-not (Test-Path $scriptPath)) {
-    throw "Missing uninstaller script: $scriptPath"
+    throw "Missing installer script: $scriptPath"
 }
 
 $bashCommand = Get-Command bash -ErrorAction SilentlyContinue
@@ -16,7 +16,7 @@ if (-not $bashCommand) {
     ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
     if (-not $gitBash) {
-        throw 'Git Bash is required to run the repo uninstaller. Install Git for Windows or ensure bash is on PATH.'
+        throw 'Git Bash is required to run the repo installer. Install Git for Windows or ensure bash is on PATH.'
     }
 
     $bashCommand = [pscustomobject]@{ Source = $gitBash }

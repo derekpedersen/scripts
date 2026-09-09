@@ -13,11 +13,11 @@ Module for elasticsearch-related tooling and shell helpers.
 From repo root:
 
 ```bash
-bash ./tools/install.sh elasticsearch
+bash ./tools.install.sh elasticsearch
 ```
 
 ```bash
-bash ./tools/uninstall.sh elasticsearch
+bash ./tools.uninstall.sh elasticsearch
 ```
 
 PowerShell (Windows):

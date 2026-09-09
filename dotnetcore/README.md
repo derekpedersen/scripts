@@ -17,11 +17,11 @@ Accepted alias names: dotnet
 From repo root:
 
 ```bash
-bash ./tools/install.sh dotnetcore
+bash ./tools.install.sh dotnetcore
 ```
 
 ```bash
-bash ./tools/uninstall.sh dotnetcore
+bash ./tools.uninstall.sh dotnetcore
 ```
 
 PowerShell (Windows):
