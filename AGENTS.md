@@ -14,6 +14,7 @@ This repository contains bash helper modules, local developer install scripts, a
 - `bash/`: shell helper scripts and aliases, usually ending in `.bash`
 - `tools/`: installer controller and OS-specific install logic
 - `helm/`: Helm-related helper scripts
+- `Makefile`: shared build and test entry points used by both local runs and Jenkins
 - `README.md`: top-level docs for repo usage
 
 ## Comment and documentation conventions
@@ -31,4 +32,6 @@ This repository contains bash helper modules, local developer install scripts, a
 - Keep changes consistent with the current repo patterns.
 - Do not add hidden magic; prefer discoverable names and straightforward behavior.
 - Update both bundle definitions and user-facing usage output when adding or changing install options.
+- Prefer adding new CI and validation behavior to `Makefile` targets first, then have `Jenkinsfile` call those targets.
+- Keep `build` for fast validation and `test` for installer smoke checks, including install and uninstall dry-run coverage.
 - Preserve compatibility with macOS and Debian-based Linux unless specifically directed otherwise.

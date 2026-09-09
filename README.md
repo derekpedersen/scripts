@@ -8,7 +8,8 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 - [tools](tools) for OS-aware developer tool installation
 - [services](services) for isolated local Docker Compose service stacks
 - [helm](helm) for Helm chart version stamping helpers
-- [Jenkinsfile](Jenkinsfile) for CI validation of script syntax and installer smoke checks
+- [Makefile](Makefile) for shared build/test orchestration
+- [Jenkinsfile](Jenkinsfile) for CI entry points that call the shared Makefile targets
 
 ## Repository map
 
@@ -91,6 +92,24 @@ Optional override for testing another branch or fork during bootstrap:
 ```bash
 SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/tools/install.sh | bash -s -- default
 ```
+
+### Uninstall Bash helpers
+
+```bash
+bash ./bash/uninstall.sh
+```
+
+This removes the managed source block from your shell profile and deletes the generated helper file (`~/.scripts-bash-helpers`).
+
+### Uninstall developer tools
+
+```bash
+bash ./tools/uninstall.sh default
+bash ./tools/uninstall.sh kubectl docker
+bash ./tools/uninstall.sh services --dry-run
+```
+
+The uninstall flow mirrors the install pattern: it is explicit, target-based, and safe by default.
 
 ## Tool installer bundles
 
@@ -183,9 +202,19 @@ This updates .helm/Chart.yaml fields:
 
 ## CI behavior
 
-[Jenkinsfile](Jenkinsfile) validates:
+
+The shared CI entry points are:
+
+- `make build` for syntax checks and Helm version stamping validation
+- `make test` for installer smoke tests, including install and uninstall dry-run coverage
+
+[Jenkinsfile](Jenkinsfile) now calls those same targets so local runs and CI stay aligned.
+
+Build/test coverage includes:
 
 - syntax of files in [bash](bash)
 - syntax of files in [tools](tools)
 - syntax of files in [helm](helm)
+- Helm `set-version.sh` behavior against a temporary fixture
 - installer smoke tests for default, services, and cloud bundles using dry-run mode
+- uninstaller smoke tests for default, services, and cloud bundles using dry-run mode

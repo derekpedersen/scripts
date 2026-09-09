@@ -43,12 +43,15 @@ git-clean-merged() {
   done
 
   git branch -r \
-    | grep 'origin/' \
-    | grep -v 'origin/main' \
-    | grep -v 'origin/HEAD' \
-    | grep -v 'origin/master' \
-    | while read -r ref; do
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+    | grep '^origin/' \
+    | grep -v '^origin/main$' \
+    | grep -v '^origin/HEAD' \
+    | grep -v '^origin/master$' \
+    | while IFS= read -r ref; do
+        [[ -z "$ref" ]] && continue
         branch="${ref#origin/}"
+        [[ -z "$branch" || "$branch" == 'HEAD -> origin/'* ]] && continue
         git push origin --delete "$branch" >/dev/null 2>&1 || true
       done
 
@@ -74,12 +77,15 @@ git-clean-removed() {
   done
 
   git branch -r \
-    | grep 'origin/' \
-    | grep -v 'origin/main' \
-    | grep -v 'origin/HEAD' \
-    | grep -v 'origin/master' \
-    | while read -r ref; do
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+    | grep '^origin/' \
+    | grep -v '^origin/main$' \
+    | grep -v '^origin/HEAD' \
+    | grep -v '^origin/master$' \
+    | while IFS= read -r ref; do
+        [[ -z "$ref" ]] && continue
         branch="${ref#origin/}"
+        [[ -z "$branch" || "$branch" == 'HEAD -> origin/'* ]] && continue
         if ! git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
           git branch -r -d "$ref" >/dev/null 2>&1 || true
         fi
