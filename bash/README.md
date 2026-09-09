@@ -37,13 +37,13 @@ To test another branch or fork during bootstrap:
 SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/bash/install.sh | bash
 ```
 
-The installer is interactive and file-aware. It scans the helper folder for `.bash` files and asks which ones you want enabled, such as:
+The installer is interactive and module-aware. It scans repo-root modules for `bash.sh` files and asks which ones you want enabled, such as:
 
-- `git.bash`
-- `docker.bash`
-- `kubernetes.bash`
+- `git/bash.sh`
+- `docker/bash.sh`
+- `kubectl/bash.sh`
 
-If a new helper file is later added under this folder, rerunning the installer will detect it and prompt you to include it.
+If a new module helper is later added, rerunning the installer will detect it and prompt you to include it.
 
 It automatically configures the correct profile for your shell:
 
@@ -251,7 +251,7 @@ bashful/
 ├── README.md
 ├── git.sh
 ├── docker.sh
-├── kubernetes.sh
+├── kubectl.sh
 └── bash.sh
 ```
 

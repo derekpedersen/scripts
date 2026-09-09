@@ -12,8 +12,9 @@ build:
 		test -d bash; \
 		test -d tools; \
 		test -d helm; \
-		for f in bash/*.bash; do echo "  - $$f"; bash -n "$$f"; done; \
+		for f in bash/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
 		for f in tools/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
+		for f in */install.sh */uninstall.sh */bash.sh; do if [[ -f "$$f" ]]; then echo "  - $$f"; bash -n "$$f"; fi; done; \
 		for f in helm/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
 		tmpdir=$$(mktemp -d); \
 		chart_tmp="$$tmpdir/chart.yaml"; \

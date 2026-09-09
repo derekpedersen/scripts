@@ -17,21 +17,22 @@ Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling 
 
 - [bash/install.sh](bash/install.sh): interactive helper loader that writes a managed source block to your shell profile
 - [bash/README.md](bash/README.md): detailed helper documentation
-- [bash/git.bash](bash/git.bash): git workflow and cleanup helpers
-- [bash/docker.bash](bash/docker.bash): Docker and cleanup helpers
-- [bash/kubernetes.bash](bash/kubernetes.bash): kubectl and troubleshooting helpers
-- [bash/aws.bash](bash/aws.bash): AWS CLI helpers
-- [bash/gcloud.bash](bash/gcloud.bash): Google Cloud helpers
-- [bash/azure.bash](bash/azure.bash): Azure CLI helpers
-- [bash/doctl.bash](bash/doctl.bash): DigitalOcean helpers
-- [bash/cloud.bash](bash/cloud.bash): multi-cloud status helper
+- [git/bash.sh](git/bash.sh): git workflow and cleanup helpers
+- [docker/bash.sh](docker/bash.sh): Docker and cleanup helpers
+- [kubectl/bash.sh](kubectl/bash.sh): kubectl and troubleshooting helpers
+- [aws/bash.sh](aws/bash.sh): AWS CLI helpers
+- [gcloud/bash.sh](gcloud/bash.sh): Google Cloud helpers
+- [az/bash.sh](az/bash.sh): Azure CLI helpers
+- [doctl/bash.sh](doctl/bash.sh): DigitalOcean helpers
+- [cloud/bash.sh](cloud/bash.sh): multi-cloud status helper
 
 ### Tool installer
 
 - [tools/install.sh](tools/install.sh): main installer controller
-- [tools/common.sh](tools/common.sh): bundle definitions and identity helpers (git, gpg, ssh)
-- [tools/macos.sh](tools/macos.sh): macOS installation logic
-- [tools/linux.sh](tools/linux.sh): Debian-based Linux installation logic
+- [tools/common.sh](tools/common.sh): bundle definitions, aliases, and identity helpers (git, gpg, ssh)
+- [tools/module-runtime.sh](tools/module-runtime.sh): shared module dispatcher runtime used by per-tool installers
+- [git/install.sh](git/install.sh): example per-tool installer module
+- [git/install.windows.ps1](git/install.windows.ps1): example Windows wrapper for a module install
 
 ### Local services
 
@@ -163,34 +164,29 @@ bash ./tools/install.sh identity
 
 ## Supported tool names
 
+Canonical module names:
+
 - git
 - gpg
+- curl
+- wget
+- unzip
+- python3
 - nvm
 - node
-- helm
-- kubectl
-- kubernetes-cli
 - golang
+- kubectl
+- helm
 - docker
-- gcloud
-- google-cloud
-- aws
-- awscli
-- eksctl
-- az
-- azure
-- azure-cli
-- doctl
-- digitalocean
-- doks
-- dotnet
 - dotnetcore
 - vscode
-- code
-- curl
-- unzip
-- wget
-- python3
+- gcloud
+- aws
+- eksctl
+- az
+- doctl
+- jq
+- yq
 - postgres
 - redis
 - mysql
@@ -203,6 +199,20 @@ bash ./tools/install.sh identity
 - git-signing
 - ssh-key
 - identity
+
+Legacy alias names (still supported):
+
+- kubernetes-cli -> kubectl
+- google-cloud -> gcloud
+- awscli -> aws
+- azure -> az
+- azure-cli -> az
+- digitalocean -> doctl
+- doks -> doctl
+- dotnet -> dotnetcore
+- code -> vscode
+
+Use canonical module names in scripts and examples.
 
 ## Helm helper usage
 

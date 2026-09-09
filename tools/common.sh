@@ -46,7 +46,7 @@ FULL_BUNDLE=(
   vscode
   code
   gcloud
-  awscli
+  aws
   eksctl
   az
   doctl
@@ -392,7 +392,7 @@ SERVICES_BUNDLE=(
 
 CLOUD_BUNDLE=(
   gcloud
-  awscli
+  aws
   eksctl
   doctl
   az
@@ -421,5 +421,91 @@ install_pkg() {
     $SUDO apt-get install -y "$pkg"
   else
     apt-get install -y "$pkg"
+  fi
+}
+
+canonical_tool_name() {
+  local tool="$1"
+
+  case "$tool" in
+    kubernetes-cli)
+      echo "kubectl"
+      ;;
+    google-cloud)
+      echo "gcloud"
+      ;;
+    awscli)
+      echo "aws"
+      ;;
+    azure|azure-cli)
+      echo "az"
+      ;;
+    digitalocean|doks)
+      echo "doctl"
+      ;;
+    dotnet)
+      echo "dotnetcore"
+      ;;
+    code)
+      echo "vscode"
+      ;;
+    *)
+      echo "$tool"
+      ;;
+  esac
+}
+
+expand_bundle_item() {
+  local item="$1"
+
+  case "$item" in
+    default)
+      printf '%s\n' "${DEFAULT_BUNDLE[@]}"
+      ;;
+    full|dev)
+      printf '%s\n' "${FULL_BUNDLE[@]}"
+      ;;
+    services)
+      printf '%s\n' "${SERVICES_BUNDLE[@]}"
+      ;;
+    cloud)
+      printf '%s\n' "${CLOUD_BUNDLE[@]}"
+      ;;
+    *)
+      printf '%s\n' "$item"
+      ;;
+  esac
+}
+
+resolve_target_tools() {
+  local expanded=()
+  local item
+  for item in "$@"; do
+    while IFS= read -r expanded_item; do
+      [[ -z "$expanded_item" ]] && continue
+      expanded+=("$(canonical_tool_name "$expanded_item")")
+    done < <(expand_bundle_item "$item")
+  done
+
+  local result=()
+  for item in "${expanded[@]}"; do
+    local seen_item
+    local already_seen=false
+    if [[ ${#result[@]} -gt 0 ]]; then
+      for seen_item in "${result[@]}"; do
+        if [[ "$seen_item" == "$item" ]]; then
+          already_seen=true
+          break
+        fi
+      done
+    fi
+
+    if [[ "$already_seen" == false ]]; then
+      result+=("$item")
+    fi
+  done
+
+  if [[ ${#result[@]} -gt 0 ]]; then
+    printf '%s\n' "${result[@]}"
   fi
 }

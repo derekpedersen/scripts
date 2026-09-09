@@ -16,6 +16,7 @@ set -euo pipefail
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/windows.sh" ]]; then
   echo "Required installer files missing: $SCRIPT_DIR/common.sh and $SCRIPT_DIR/windows.sh"
   exit 1
@@ -48,9 +49,21 @@ Usage: bash ./tools/uninstall.sh [default|full|dev|services|cloud|<tool> [tool .
 
 Bundle targets:
   default  = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode
-  full/dev = default + gcloud, awscli, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq
+  full/dev = default + gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq
   services = postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka
-  cloud    = gcloud, awscli, eksctl, az, doctl, jq, yq
+  cloud    = gcloud, aws, eksctl, az, doctl, jq, yq
+
+Canonical tools:
+  git, gpg, curl, wget, unzip, python3, nvm, node, golang, kubectl, helm, docker,
+  dotnetcore, vscode, gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis,
+  mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka, git-config,
+  git-signing, ssh-key, identity
+
+Legacy aliases (supported):
+  kubernetes-cli->kubectl, google-cloud->gcloud, awscli->aws,
+  azure|azure-cli->az, digitalocean|doks->doctl, dotnet->dotnetcore, code->vscode
+
+Use canonical names in scripts and examples.
 
 Examples:
   bash ./tools/uninstall.sh default
@@ -76,6 +89,8 @@ if [[ ${#args[@]} -eq 0 ]]; then
   usage
   exit 1
 fi
+
+INTERNAL_MODE="${TOOLS_UNINSTALL_MODULE_INTERNAL:-0}"
 
 expand_bundle() {
   local item="$1"
@@ -489,26 +504,59 @@ uninstall_tool() {
   esac
 }
 
-TARGETS=$(resolve_targets "${args[@]}")
 TARGET_LIST=()
-while IFS= read -r target; do
-  [[ -z "$target" ]] && continue
-  TARGET_LIST+=("$target")
-done < <(printf '%s\n' "$TARGETS")
+if [[ "$INTERNAL_MODE" == "1" ]]; then
+  while IFS= read -r target; do
+    [[ -z "$target" ]] && continue
+    TARGET_LIST+=("$(canonical_tool_name "$target")")
+  done < <(printf '%s\n' "${args[@]}")
+else
+  while IFS= read -r target; do
+    [[ -z "$target" ]] && continue
+    TARGET_LIST+=("$target")
+  done < <(resolve_target_tools "${args[@]}")
+fi
 
 if [[ ${#TARGET_LIST[@]} -eq 0 ]]; then
   usage
   exit 1
 fi
 
-if [[ "$DRY_RUN" == true ]]; then
-  echo "DRY RUN: would uninstall the following tools:"
-  printf '  - %s\n' "${TARGET_LIST[@]}"
+if [[ "$INTERNAL_MODE" == "1" ]]; then
+  for tool in "${TARGET_LIST[@]}"; do
+    uninstall_tool "$tool"
+  done
+  echo "Internal uninstall complete for: ${TARGET_LIST[*]}"
   exit 0
 fi
 
+if [[ "$DRY_RUN" == true ]]; then
+  echo "DRY RUN: would uninstall the following tools:"
+  printf '  - %s\n' "${TARGET_LIST[@]}"
+fi
+
+failures=0
 for tool in "${TARGET_LIST[@]}"; do
-  uninstall_tool "$tool"
+  module_uninstaller="$REPO_ROOT/$tool/uninstall.sh"
+  if [[ ! -f "$module_uninstaller" ]]; then
+    echo "Missing module uninstaller: $module_uninstaller"
+    failures=$((failures + 1))
+    continue
+  fi
+
+  if ! DRY_RUN="$DRY_RUN" SCRIPTS_OS_OVERRIDE="${SCRIPTS_OS_OVERRIDE:-}" bash "$module_uninstaller"; then
+    echo "Module uninstall failed: $tool"
+    failures=$((failures + 1))
+  fi
 done
 
-echo "Uninstall complete for: ${TARGET_LIST[*]}"
+if (( failures > 0 )); then
+  echo "Uninstall finished with $failures failure(s)."
+  exit 1
+fi
+
+if [[ "$DRY_RUN" == true ]]; then
+  echo "Dry run complete for: ${TARGET_LIST[*]}"
+else
+  echo "Uninstall complete for: ${TARGET_LIST[*]}"
+fi

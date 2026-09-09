@@ -11,8 +11,9 @@ This repository contains bash helper modules, local developer install scripts, a
 - Treat destructive tooling as opt-in and confirm before deletion or cleanup.
 
 ## File layout
-- `bash/`: shell helper scripts and aliases, usually ending in `.bash`
-- `tools/`: installer controller and OS-specific install logic
+- `bash/`: helper installer entrypoints and docs
+- `tools/`: installer controllers and shared runtime/helpers
+- `<tool>/`: per-tool modules at repo root containing `install.sh`, `uninstall.sh`, optional `install.windows.ps1`, and optional `bash.sh`
 - `helm/`: Helm-related helper scripts
 - `Makefile`: shared build and test entry points used by both local runs and Jenkins
 - `README.md`: top-level docs for repo usage

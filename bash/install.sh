@@ -41,14 +41,15 @@ bootstrap_from_github() {
 
 # BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SHELL_NAME="${SHELL:-}"
 MARKER_BEGIN="# >>> scripts/bash helpers >>>"
 MARKER_END="# <<< scripts/bash helpers <<<"
 LEGACY_LINE="# Added by scripts/bash/install.sh"
 
-if ! compgen -G "$SCRIPT_DIR/*.bash" >/dev/null 2>&1; then
+if ! find "$REPO_ROOT" -mindepth 2 -maxdepth 2 -type f -name 'bash.sh' | grep -q .; then
   if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
-    echo "No helper files found in $SCRIPT_DIR and bootstrap already ran."
+    echo "No helper modules found in $REPO_ROOT and bootstrap already ran."
     exit 1
   fi
 
@@ -68,13 +69,13 @@ if [[ ! -f "$PROFILE_FILE" ]]; then
   touch "$PROFILE_FILE"
 fi
 
-helper_files=()
+helper_modules=()
 while IFS= read -r file; do
-  helper_files+=("$(basename "$file")")
-done < <(find "$SCRIPT_DIR" -maxdepth 1 -type f -name '*.bash' ! -name 'install.sh' | sort)
+  helper_modules+=("$(basename "$(dirname "$file")")")
+done < <(find "$REPO_ROOT" -mindepth 2 -maxdepth 2 -type f -name 'bash.sh' | sort)
 
-if ((${#helper_files[@]} == 0)); then
-  echo "No helper files found in $SCRIPT_DIR"
+if ((${#helper_modules[@]} == 0)); then
+  echo "No helper modules found in $REPO_ROOT"
   exit 0
 fi
 
@@ -138,15 +139,41 @@ selected_files=()
 existing_selection="$(read_existing_selection "$PROFILE_FILE")"
 if [[ -n "$existing_selection" ]]; then
   for file in $existing_selection; do
-    selected_files+=("$file")
+    normalized="$file"
+    if [[ "$file" == */bash.sh ]]; then
+      normalized="${file%%/*}"
+    elif [[ "$file" == *.bash ]]; then
+      normalized="${file%.bash}"
+    fi
+    selected_files+=("$normalized")
+  done
+fi
+
+deduped_selection=()
+for selected in ${selected_files[@]+"${selected_files[@]}"}; do
+  already_selected=0
+  for existing in ${deduped_selection[@]+"${deduped_selection[@]}"}; do
+    if [[ "$existing" == "$selected" ]]; then
+      already_selected=1
+      break
+    fi
+  done
+  if (( already_selected == 0 )); then
+    deduped_selection+=("$selected")
+  fi
+done
+selected_files=()
+if ((${#deduped_selection[@]} > 0)); then
+  for selected in ${deduped_selection[@]+"${deduped_selection[@]}"}; do
+    selected_files+=("$selected")
   done
 fi
 
 if [[ -t 0 ]]; then
   available_missing=()
-  for file in "${helper_files[@]}"; do
+  for file in ${helper_modules[@]+"${helper_modules[@]}"}; do
     already_selected=0
-    for selected in "${selected_files[@]}"; do
+    for selected in ${selected_files[@]+"${selected_files[@]}"}; do
       if [[ "$selected" == "$file" ]]; then
         already_selected=1
         break
@@ -158,35 +185,35 @@ if [[ -t 0 ]]; then
   done
 
   if (( ${#available_missing[@]} > 0 )); then
-    echo "New helper files available:"
-    for i in "${!helper_files[@]}"; do
-      printf '  %2d) %s\n' "$((i + 1))" "${helper_files[$i]}"
+    echo "New helper modules available:"
+    for i in "${!helper_modules[@]}"; do
+      printf '  %2d) %s\n' "$((i + 1))" "${helper_modules[$i]}"
     done
-    printf 'Select the files to enable (blank = all, or enter a comma-separated list like 1,3): '
+    printf 'Select the modules to enable (blank = all, or enter a comma-separated list like 1,3): '
     read -r response
 
     if [[ -n "$response" ]]; then
       selected_files=()
       IFS=',' read -ra picks <<< "$response"
-      for pick in "${picks[@]}"; do
+      for pick in ${picks[@]+"${picks[@]}"}; do
         pick="${pick//[[:space:]]/}"
-        if [[ "$pick" =~ ^[0-9]+$ ]] && (( pick >= 1 && pick <= ${#helper_files[@]} )); then
-          selected_files+=("${helper_files[$((pick - 1))]}")
+        if [[ "$pick" =~ ^[0-9]+$ ]] && (( pick >= 1 && pick <= ${#helper_modules[@]} )); then
+          selected_files+=("${helper_modules[$((pick - 1))]}")
         fi
       done
 
       if ((${#selected_files[@]} == 0)); then
-        selected_files=("${helper_files[@]}")
+        selected_files=("${helper_modules[@]}")
       fi
     else
-      selected_files=("${helper_files[@]}")
+      selected_files=("${helper_modules[@]}")
     fi
   elif ((${#selected_files[@]} == 0)); then
-    selected_files=("${helper_files[@]}")
+    selected_files=("${helper_modules[@]}")
   fi
 else
   if ((${#selected_files[@]} == 0)); then
-    selected_files=("${helper_files[@]}")
+    selected_files=("${helper_modules[@]}")
   fi
 fi
 
@@ -211,15 +238,15 @@ HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
   echo "# Rerun the installer to update: https://github.com/derekpedersen/scripts"
   echo "# selected: $selected_list"
   echo
-  for selected in "${selected_files[@]}"; do
-    file="$SCRIPT_DIR/$selected"
+  for selected in ${selected_files[@]+"${selected_files[@]}"}; do
+    file="$REPO_ROOT/$selected/bash.sh"
     if [[ -f "$file" ]]; then
-      echo "# ---- begin $selected ----"
+      echo "# ---- begin $selected/bash.sh ----"
       # Ensure a trailing newline even if the source file is missing one,
       # otherwise its last line merges with the following comment marker.
       cat "$file"
       echo
-      echo "# ---- end $selected ----"
+      echo "# ---- end $selected/bash.sh ----"
       echo
     fi
   done

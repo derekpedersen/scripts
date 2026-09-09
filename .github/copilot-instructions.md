@@ -45,8 +45,8 @@ docker-login() {
 ```
 
 ## File patterns
-- Bash helper files go in `bash/` and end with `.bash`.
-- Installer logic goes in `tools/` and uses `install.sh` as the controller.
+- Bash helper module files go in repo-root tool folders as `<tool>/bash.sh`.
+- Installer entrypoints stay in `tools/` (`install.sh` and `uninstall.sh`) and dispatch to per-tool modules.
 - Keep bundle names stable in `tools/common.sh` and keep usage text in sync with `tools/install.sh`.
 - Prefer functions and aliases that are discoverable by name.
 
@@ -62,4 +62,4 @@ docker-login() {
 - Maintain compatibility with macOS and Debian-based Linux unless the task explicitly calls for a narrower target.
 - When editing scripts, preserve the repo’s idempotent behavior and safe rerun semantics.
 - If a new helper is added under `bash/`, ensure it is consistent with the existing helper naming and loading flow.
-- If a new tool is added to install logic, update the bundle definitions and usage output together.
+- If a new tool is added to install logic, add its module folder and update bundle definitions and usage output together.
