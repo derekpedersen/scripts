@@ -89,16 +89,27 @@ resolve_targets() {
     done < <(expand_bundle "$item")
   done
 
-  declare -A seen=()
   local result=()
   for item in "${expanded[@]}"; do
-    if [[ -z "${seen[$item]:-}" ]]; then
+    local seen_item
+    local already_seen=false
+    if [[ ${#result[@]} -gt 0 ]]; then
+      for seen_item in "${result[@]}"; do
+        if [[ "$seen_item" == "$item" ]]; then
+          already_seen=true
+          break
+        fi
+      done
+    fi
+
+    if [[ "$already_seen" == false ]]; then
       result+=("$item")
-      seen["$item"]=1
     fi
   done
 
-  printf '%s\n' "${result[@]}"
+  if [[ ${#result[@]} -gt 0 ]]; then
+    printf '%s\n' "${result[@]}"
+  fi
 }
 
 remove_git_identity_config() {
@@ -348,7 +359,11 @@ uninstall_tool() {
 }
 
 TARGETS=$(resolve_targets "${args[@]}")
-mapfile -t TARGET_LIST < <(printf '%s\n' "$TARGETS")
+TARGET_LIST=()
+while IFS= read -r target; do
+  [[ -z "$target" ]] && continue
+  TARGET_LIST+=("$target")
+done < <(printf '%s\n' "$TARGETS")
 
 if [[ ${#TARGET_LIST[@]} -eq 0 ]]; then
   usage
