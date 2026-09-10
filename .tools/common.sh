@@ -10,7 +10,7 @@ set -euo pipefail
 #   developer bootstrap installer.
 #
 # Notes:
-#   Keep bundle names stable and update the usage text in tools.install.sh
+#   Keep bundle names stable and update the usage text in .tools/install.sh
 #   whenever adding or changing install options.
 # ============================================================
 
@@ -111,7 +111,7 @@ configure_gpg_key() {
   fi
 
   if ! command -v gpg >/dev/null 2>&1; then
-    echo "GPG is not installed yet. Install it with: bash ./tools.install.sh gpg"
+    echo "GPG is not installed yet. Install it with: bash ./.tools/install.sh gpg"
     return 1
   fi
 

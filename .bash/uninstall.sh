@@ -7,7 +7,7 @@ set -euo pipefail
 #
 # Purpose:
 #   Remove the managed bash helper block and generated helper file that
-#   were installed by bash.install.sh.
+#   were installed by .bash/install.sh.
 #
 # Notes:
 #   This is a safe, explicit uninstall for the repo's managed bash helper

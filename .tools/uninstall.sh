@@ -17,12 +17,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR"
-if [[ ! -f "$SCRIPT_DIR/tools.common.sh" || ! -f "$SCRIPT_DIR/tools.windows.sh" ]]; then
-  echo "Required installer files missing: $SCRIPT_DIR/tools.common.sh and $SCRIPT_DIR/tools.windows.sh"
+if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/windows.sh" ]]; then
+  echo "Required installer files missing: $SCRIPT_DIR/common.sh and $SCRIPT_DIR/windows.sh"
   exit 1
 fi
 
-source "$SCRIPT_DIR/tools.common.sh"
+source "$SCRIPT_DIR/common.sh"
 
 OS="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
 case "$OS" in
@@ -30,7 +30,7 @@ case "$OS" in
     PLATFORM="unix"
     ;;
   MINGW*|MSYS*|CYGWIN*|Windows_NT)
-    source "$SCRIPT_DIR/tools.windows.sh"
+    source "$SCRIPT_DIR/windows.sh"
     PLATFORM="windows"
     ;;
   *)
@@ -45,7 +45,7 @@ esac
 
 usage() {
   cat <<'EOF'
-Usage: bash ./tools.uninstall.sh [default|full|dev|services|cloud|<tool> [tool ...]] [--dry-run]
+Usage: bash ./.tools/uninstall.sh [default|full|dev|services|cloud|<tool> [tool ...]] [--dry-run]
 
 Bundle targets:
   default  = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode
@@ -66,9 +66,9 @@ Legacy aliases (supported):
 Use canonical names in scripts and examples.
 
 Examples:
-  bash ./tools.uninstall.sh default
-  bash ./tools.uninstall.sh kubectl docker --dry-run
-  bash ./tools.uninstall.sh services
+  bash ./.tools/uninstall.sh default
+  bash ./.tools/uninstall.sh kubectl docker --dry-run
+  bash ./.tools/uninstall.sh services
 EOF
 }
 

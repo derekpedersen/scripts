@@ -1,6 +1,8 @@
 # tools
 
-Central installer and uninstaller entrypoints plus shared runtime/helpers.
+Installer/runtime layer for the repo's bundle-based tool installation flow.
+
+This folder contains the controller and platform logic that resolves bundles, dispatches module installers, and keeps the cross-platform behavior in one place. Individual tool packages continue to live as repo-root directories such as [docker](docker), [kubectl](kubectl), [aws](aws), [gcloud](gcloud), and [git](git).
 
 ## Files
 

@@ -35,13 +35,13 @@ bootstrap_from_github() {
   tar -xzf "$archive" -C "$tmpdir"
 
   extracted_dir="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
-  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/tools.install.sh" ]]; then
-    echo "Bootstrap failed: could not find tools.install.sh in downloaded archive."
+  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/.tools/install.sh" ]]; then
+    echo "Bootstrap failed: could not find .tools/install.sh in downloaded archive."
     rm -rf "$tmpdir"
     return 1
   fi
 
-  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/tools.install.sh" "$@"
+  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/.tools/install.sh" "$@"
   rc=$?
   rm -rf "$tmpdir"
   return $rc
@@ -49,9 +49,9 @@ bootstrap_from_github() {
 
 # BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
-REPO_ROOT="$SCRIPT_DIR"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-if [[ ! -f "$SCRIPT_DIR/tools.common.sh" || ! -f "$SCRIPT_DIR/tools.module-runtime.sh" || ! -f "$REPO_ROOT/git/install.sh" ]]; then
+if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/module-runtime.sh" || ! -f "$REPO_ROOT/git/install.sh" ]]; then
   if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
     echo "Required installer files are missing from $SCRIPT_DIR and bootstrap already ran."
     exit 1
@@ -61,7 +61,7 @@ if [[ ! -f "$SCRIPT_DIR/tools.common.sh" || ! -f "$SCRIPT_DIR/tools.module-runti
   exit $?
 fi
 
-source "$SCRIPT_DIR/tools.common.sh"
+source "$SCRIPT_DIR/common.sh"
 
 DRY_RUN=false
 args=()

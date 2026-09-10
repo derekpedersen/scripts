@@ -18,12 +18,12 @@ set -euo pipefail
 TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 REPO_ROOT="$TOOLS_DIR"
 
-if [[ ! -f "$TOOLS_DIR/tools.common.sh" ]]; then
-  echo "Missing required helper: $TOOLS_DIR/tools.common.sh"
+if [[ ! -f "$TOOLS_DIR/common.sh" ]]; then
+  echo "Missing required helper: $TOOLS_DIR/common.sh"
   exit 1
 fi
 
-source "$TOOLS_DIR/tools.common.sh"
+source "$TOOLS_DIR/common.sh"
 
 OS_NAME="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
 PLATFORM=""
@@ -83,7 +83,7 @@ module_install() {
       if [[ "${DRY_RUN:-false}" == true ]]; then
         echo "DRY RUN: would configure Git identity, GPG signing, and SSH key."
       else
-        configure_identity_interactive "$REPO_ROOT/tools.install.sh" || true
+        configure_identity_interactive "$REPO_ROOT/.tools/install.sh" || true
       fi
       return 0
       ;;
@@ -111,10 +111,10 @@ module_uninstall() {
     return 0
   fi
 
-  if [[ -f "$REPO_ROOT/tools.uninstall.sh" ]]; then
-    TOOLS_UNINSTALL_MODULE_INTERNAL=1 bash "$REPO_ROOT/tools.uninstall.sh" "$tool"
+  if [[ -f "$REPO_ROOT/.tools/uninstall.sh" ]]; then
+    TOOLS_UNINSTALL_MODULE_INTERNAL=1 bash "$REPO_ROOT/.tools/uninstall.sh" "$tool"
   else
-    echo "Missing required script: $REPO_ROOT/tools.uninstall.sh"
+    echo "Missing required script: $REPO_ROOT/.tools/uninstall.sh"
     return 1
   fi
 }

@@ -1,6 +1,8 @@
 # Local developer services
 
-This folder contains a small local Docker Compose stack for common application dependencies. It is intentionally isolated from the rest of the repo and uses non-standard ports so it can coexist with other local development services.
+This service domain contains a small local Docker Compose stack for common application dependencies. It is intentionally isolated from the tool installation runtime and uses non-standard ports so it can coexist with other local development services.
+
+The service stack is a separate concern from the repo's developer tool modules. Tool installers and shared runtime logic remain in the root-level tooling layer and the [tools](tools) controller; the service stack remains under the service namespace.
 
 ## Included services
 
@@ -20,7 +22,7 @@ This folder contains a small local Docker Compose stack for common application d
 From the repo root:
 
 ```bash
-bash ./services/local-dev.sh
+bash ./.services/local-dev.sh
 ```
 
 You will be prompted to choose a preset such as:
@@ -44,9 +46,9 @@ The custom selector accepts numbered multi-select input such as `1 3 5` or `all`
 ## Useful commands
 
 ```bash
-bash ./services/local-dev.sh status
-bash ./services/local-dev.sh logs postgres
-bash ./services/local-dev.sh down
+bash ./.services/local-dev.sh status
+bash ./.services/local-dev.sh logs postgres
+bash ./.services/local-dev.sh down
 ```
 
 ## Notes
