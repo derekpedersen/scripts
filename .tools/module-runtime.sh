@@ -30,20 +30,20 @@ PLATFORM=""
 case "$OS_NAME" in
   Darwin)
     PLATFORM="mac"
-    source "$TOOLS_DIR/tools.macos.sh"
+    source "$TOOLS_DIR/macos.sh"
     ;;
   Linux)
     PLATFORM="linux"
-    source "$TOOLS_DIR/tools.linux.sh"
+    source "$TOOLS_DIR/linux.sh"
     ;;
   MINGW*|MSYS*|CYGWIN*|Windows_NT)
     PLATFORM="windows"
-    source "$TOOLS_DIR/tools.windows.sh"
+    source "$TOOLS_DIR/windows.sh"
     ;;
   *)
     if [[ -n "${WSL_DISTRO_NAME:-}" || "$(uname -r 2>/dev/null || true)" == *Microsoft* ]]; then
       PLATFORM="linux"
-      source "$TOOLS_DIR/tools.linux.sh"
+      source "$TOOLS_DIR/linux.sh"
     else
       echo "Unsupported OS: $OS_NAME"
       exit 1
@@ -90,6 +90,12 @@ module_install() {
   esac
 
   if [[ "${DRY_RUN:-false}" == true ]]; then
+    if [[ "$tool" == "python3" ]]; then
+      echo "DRY RUN: would install python3"
+      echo "DRY RUN: would install Python developer packages:"
+      printf '  - %s\n' "${PYTHON_DEV_PACKAGES[@]}"
+      return 0
+    fi
     echo "DRY RUN: would install $tool"
     return 0
   fi

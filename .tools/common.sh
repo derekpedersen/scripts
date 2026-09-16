@@ -60,6 +60,43 @@ FULL_BUNDLE=(
   rabbitmq
 )
 
+PYTHON_DEV_PACKAGES=(
+  "pip-tools"
+  "pipx"
+  "virtualenv"
+  "black"
+  "ruff"
+  "mypy"
+  "pytest"
+  "pre-commit"
+  "requests"
+  "boto3"
+  "numpy"
+  "pandas"
+  "jupyterlab"
+  "scipy"
+  "matplotlib"
+)
+
+install_python_dev_packages() {
+  local python_cmd="${1:-python3}"
+
+  if ! command -v "$python_cmd" >/dev/null 2>&1; then
+    echo "Python executable not found: $python_cmd"
+    return 0
+  fi
+
+  if [[ "${DRY_RUN:-false}" == true ]]; then
+    echo "DRY RUN: would install Python developer packages with $python_cmd"
+    printf '  - %s\n' "${PYTHON_DEV_PACKAGES[@]}"
+    return 0
+  fi
+
+  echo "Installing Python developer packages via pip..."
+  "$python_cmd" -m pip install --user --upgrade pip setuptools wheel
+  "$python_cmd" -m pip install --user "${PYTHON_DEV_PACKAGES[@]}"
+}
+
 configure_git_identity() {
   local name="${GIT_USER_NAME:-}"
   local email="${GIT_USER_EMAIL:-}"

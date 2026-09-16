@@ -78,6 +78,7 @@ install_windows() {
         ;;
       python3)
         install_winget_if_missing "Python.Python.3.12" "python"
+        install_python_dev_packages "python"
         ;;
       nvm)
         install_winget_if_missing "CoreyButler.NVMforWindows" "nvm"

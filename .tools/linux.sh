@@ -240,6 +240,8 @@ install_linux() {
         ;;
       python3)
         install_apt_pkg_if_missing "python3" "python3"
+        install_apt_pkg_if_missing "python3-pip" "pip3"
+        install_python_dev_packages "python3"
         ;;
       postgres)
         install_apt_pkg_if_missing "postgresql" "pg_ctl"

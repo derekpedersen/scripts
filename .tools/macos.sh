@@ -146,6 +146,7 @@ install_mac() {
         ;;
       python3)
         install_brew_formula_if_missing "python"
+        install_python_dev_packages "python3"
         ;;
       postgres)
         install_brew_formula_if_missing "postgresql@16"
