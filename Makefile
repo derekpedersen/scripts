@@ -9,11 +9,14 @@ all: build test
 
 build:
 	@bash -lc 'set -euo pipefail; \
-		test -d bash; \
-		test -d tools; \
+		test -f .bash/install.sh; \
+		test -f .bash/uninstall.sh; \
+		test -f .tools/install.sh; \
+		test -f .tools/uninstall.sh; \
 		test -d helm; \
-		for f in bash/*.bash; do echo "  - $$f"; bash -n "$$f"; done; \
-		for f in tools/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
+		for f in .bash/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
+		for f in .tools/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
+		for f in */install.sh */uninstall.sh */bash.sh; do if [[ -f "$$f" ]]; then echo "  - $$f"; bash -n "$$f"; fi; done; \
 		for f in helm/*.sh; do echo "  - $$f"; bash -n "$$f"; done; \
 		tmpdir=$$(mktemp -d); \
 		chart_tmp="$$tmpdir/chart.yaml"; \
@@ -33,5 +36,5 @@ build:
 
 test:
 	@bash -lc 'set -euo pipefail; \
-		for bundle in $(BUNDLES); do echo "Testing install bundle: $$bundle"; bash ./tools/install.sh "$$bundle" --dry-run; done; \
-		for bundle in $(BUNDLES); do echo "Testing uninstall bundle: $$bundle"; bash ./tools/uninstall.sh "$$bundle" --dry-run; done'
+		for bundle in $(BUNDLES); do echo "Testing install bundle: $$bundle"; bash ./tools.install.sh "$$bundle" --dry-run; done; \
+		for bundle in $(BUNDLES); do echo "Testing uninstall bundle: $$bundle"; bash ./tools.uninstall.sh "$$bundle" --dry-run; done'
