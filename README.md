@@ -75,6 +75,7 @@ The repo-root tool folders are intentionally atomized and individual: each packa
 
 - [AGENTS.md](AGENTS.md): repository agent guidance
 - [.github/copilot-instructions.md](.github/copilot-instructions.md): Copilot-specific conventions
+- [.github/dependabot.yml](.github/dependabot.yml): weekly dependency update checks for GitHub Actions, Docker, and Python packages
 
 ## Quick start
 
