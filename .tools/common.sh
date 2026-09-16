@@ -60,108 +60,42 @@ FULL_BUNDLE=(
   rabbitmq
 )
 
-PYTHON_CORE_PACKAGES=(
-  "pip-tools"
-  "pipx"
-  "virtualenv"
-  "black"
-  "ruff"
-  "mypy"
-  "pytest"
-  "pre-commit"
-  "requests"
-  "boto3"
-  "numpy"
-  "pandas"
-  "jupyterlab"
-  "python-dotenv"
-)
+COMMON_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+REPO_ROOT="$(cd "$COMMON_TOOLS_DIR/.." && pwd)"
 
-PYTHON_FULL_PACKAGES=(
-  "pip-tools"
-  "pipx"
-  "virtualenv"
-  "black"
-  "ruff"
-  "mypy"
-  "pytest"
-  "pytest-cov"
-  "pre-commit"
-  "requests"
-  "urllib3"
-  "httpx"
-  "boto3"
-  "botocore"
-  "pydantic"
-  "python-dotenv"
-  "numpy"
-  "pandas"
-  "polars"
-  "scipy"
-  "matplotlib"
-  "seaborn"
-  "jupyterlab"
-  "notebook"
-  "ipykernel"
-  "pyyaml"
-  "sqlalchemy"
-  "psycopg"
-  "redis"
-  "aiohttp"
-  "click"
-  "rich"
-  "typer"
-  "pandas-stubs"
-  "types-requests"
-)
+load_tool_package_manifest() {
+  local tool_name="${1:-}"
 
-NODE_CORE_PACKAGES=(
-  "eslint"
-  "prettier"
-  "typescript"
-  "tsx"
-  "nodemon"
-  "@types/node"
-)
-
-NODE_FULL_PACKAGES=(
-  "eslint"
-  "prettier"
-  "typescript"
-  "tsx"
-  "nodemon"
-  "@types/node"
-  "vite"
-  "vitest"
-  "jest"
-  "eslint-config-prettier"
-  "npm-check-updates"
-)
-
-GO_CORE_PACKAGES=(
-  "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-  "mvdan.cc/gofumpt@latest"
-  "github.com/go-delve/delve/cmd/dlv@latest"
-  "honnef.co/go/tools/cmd/staticcheck@latest"
-)
-
-GO_FULL_PACKAGES=(
-  "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-  "mvdan.cc/gofumpt@latest"
-  "github.com/go-delve/delve/cmd/dlv@latest"
-  "honnef.co/go/tools/cmd/staticcheck@latest"
-  "github.com/google/wire/cmd/wire@latest"
-  "github.com/golang-migrate/migrate/v4/cmd/migrate@latest"
-  "github.com/go-swagger/go-swagger/cmd/swagger@latest"
-  "github.com/air-verse/air@latest"
-  "gotest.tools/gotestsum@latest"
-  "github.com/segmentio/golines@latest"
-)
+  case "$tool_name" in
+    python3)
+      if [[ -f "$REPO_ROOT/python3/packages.sh" ]]; then
+        source "$REPO_ROOT/python3/packages.sh"
+      fi
+      ;;
+    golang)
+      if [[ -f "$REPO_ROOT/golang/packages.sh" ]]; then
+        source "$REPO_ROOT/golang/packages.sh"
+      fi
+      ;;
+    node)
+      if [[ -f "$REPO_ROOT/node/packages.sh" ]]; then
+        source "$REPO_ROOT/node/packages.sh"
+      fi
+      ;;
+  esac
+}
 
 install_python_dev_packages() {
+  load_tool_package_manifest "python3"
+
   local python_cmd="${1:-python3}"
   local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
   local package_list=()
+
+  if [[ -z "${PYTHON_CORE_PACKAGES[*]:-}" ]]; then
+    echo "Python package manifest not found."
+    return 0
+  fi
 
   if [[ "$package_profile" == "core" ]]; then
     package_list=("${PYTHON_CORE_PACKAGES[@]}")
@@ -186,9 +120,16 @@ install_python_dev_packages() {
 }
 
 install_go_dev_packages() {
+  load_tool_package_manifest "golang"
+
   local go_cmd="${1:-go}"
   local package_profile="${GO_PACKAGE_PROFILE:-full}"
   local package_list=()
+
+  if [[ -z "${GO_CORE_PACKAGES[*]:-}" ]]; then
+    echo "Go package manifest not found."
+    return 0
+  fi
 
   if [[ "$package_profile" == "core" ]]; then
     package_list=("${GO_CORE_PACKAGES[@]}")
@@ -213,9 +154,16 @@ install_go_dev_packages() {
 }
 
 install_node_dev_packages() {
+  load_tool_package_manifest "node"
+
   local node_cmd="${1:-node}"
   local package_profile="${NODE_PACKAGE_PROFILE:-full}"
   local package_list=()
+
+  if [[ -z "${NODE_CORE_PACKAGES[*]:-}" ]]; then
+    echo "Node package manifest not found."
+    return 0
+  fi
 
   if [[ "$package_profile" == "core" ]]; then
     package_list=("${NODE_CORE_PACKAGES[@]}")

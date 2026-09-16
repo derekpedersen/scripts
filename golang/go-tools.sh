@@ -18,6 +18,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 source "$SCRIPT_DIR/../.tools/common.sh"
+source "$SCRIPT_DIR/packages.sh"
 
 GO_PACKAGE_PROFILE="${GO_PACKAGE_PROFILE:-full}"
 if [[ "$GO_PACKAGE_PROFILE" == "core" ]]; then

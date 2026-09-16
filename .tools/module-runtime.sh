@@ -91,6 +91,7 @@ module_install() {
 
   if [[ "${DRY_RUN:-false}" == true ]]; then
     if [[ "$tool" == "python3" ]]; then
+      load_tool_package_manifest "python3"
       local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
       local package_list=()
 
@@ -106,6 +107,7 @@ module_install() {
       return 0
     fi
     if [[ "$tool" == "golang" ]]; then
+      load_tool_package_manifest "golang"
       local package_profile="${GO_PACKAGE_PROFILE:-full}"
       local package_list=()
 
@@ -121,6 +123,7 @@ module_install() {
       return 0
     fi
     if [[ "$tool" == "node" ]]; then
+      load_tool_package_manifest "node"
       local package_profile="${NODE_PACKAGE_PROFILE:-full}"
       local package_list=()
 

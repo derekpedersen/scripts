@@ -18,6 +18,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 source "$SCRIPT_DIR/../.tools/common.sh"
+source "$SCRIPT_DIR/packages.sh"
 
 PYTHON_PACKAGE_PROFILE="${PYTHON_PACKAGE_PROFILE:-full}"
 if [[ "$PYTHON_PACKAGE_PROFILE" == "core" ]]; then
