@@ -115,6 +115,26 @@ PYTHON_FULL_PACKAGES=(
   "types-requests"
 )
 
+GO_CORE_PACKAGES=(
+  "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+  "mvdan.cc/gofumpt@latest"
+  "github.com/go-delve/delve/cmd/dlv@latest"
+  "honnef.co/go/tools/cmd/staticcheck@latest"
+)
+
+GO_FULL_PACKAGES=(
+  "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+  "mvdan.cc/gofumpt@latest"
+  "github.com/go-delve/delve/cmd/dlv@latest"
+  "honnef.co/go/tools/cmd/staticcheck@latest"
+  "github.com/google/wire/cmd/wire@latest"
+  "github.com/golang-migrate/migrate/v4/cmd/migrate@latest"
+  "github.com/go-swagger/go-swagger/cmd/swagger@latest"
+  "github.com/air-verse/air@latest"
+  "gotest.tools/gotestsum@latest"
+  "github.com/segmentio/golines@latest"
+)
+
 install_python_dev_packages() {
   local python_cmd="${1:-python3}"
   local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
@@ -140,6 +160,33 @@ install_python_dev_packages() {
   echo "Installing Python developer packages via pip ($package_profile profile)..."
   "$python_cmd" -m pip install --user --upgrade pip setuptools wheel
   "$python_cmd" -m pip install --user "${package_list[@]}"
+}
+
+install_go_dev_packages() {
+  local go_cmd="${1:-go}"
+  local package_profile="${GO_PACKAGE_PROFILE:-full}"
+  local package_list=()
+
+  if [[ "$package_profile" == "core" ]]; then
+    package_list=("${GO_CORE_PACKAGES[@]}")
+  else
+    package_list=("${GO_FULL_PACKAGES[@]}")
+  fi
+
+  if ! command -v "$go_cmd" >/dev/null 2>&1; then
+    echo "Go executable not found: $go_cmd"
+    return 0
+  fi
+
+  if [[ "${DRY_RUN:-false}" == true ]]; then
+    echo "DRY RUN: would install Go developer packages with $go_cmd ($package_profile profile)"
+    printf '  - %s\n' "${package_list[@]}"
+    return 0
+  fi
+
+  echo "Installing Go developer packages via go install ($package_profile profile)..."
+  export PATH="$PATH:$HOME/go/bin"
+  "$go_cmd" install "${package_list[@]}"
 }
 
 configure_git_identity() {
@@ -540,6 +587,15 @@ canonical_tool_name() {
     python)
       echo "python3"
       ;;
+    go-core)
+      echo "golang"
+      ;;
+    go-full)
+      echo "golang"
+      ;;
+    go|golang)
+      echo "golang"
+      ;;
     *)
       echo "$tool"
       ;;
@@ -564,6 +620,15 @@ expand_bundle_item() {
       ;;
     python)
       printf '%s\n' "python3"
+      ;;
+    go-core)
+      printf '%s\n' "golang"
+      ;;
+    go-full)
+      printf '%s\n' "golang"
+      ;;
+    go)
+      printf '%s\n' "golang"
       ;;
     services)
       printf '%s\n' "${SERVICES_BUNDLE[@]}"

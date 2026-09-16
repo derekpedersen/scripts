@@ -105,6 +105,21 @@ module_install() {
       printf '  - %s\n' "${package_list[@]}"
       return 0
     fi
+    if [[ "$tool" == "golang" ]]; then
+      local package_profile="${GO_PACKAGE_PROFILE:-full}"
+      local package_list=()
+
+      if [[ "$package_profile" == "core" ]]; then
+        package_list=("${GO_CORE_PACKAGES[@]}")
+      else
+        package_list=("${GO_FULL_PACKAGES[@]}")
+      fi
+
+      echo "DRY RUN: would install golang"
+      echo "DRY RUN: would install Go developer packages:"
+      printf '  - %s\n' "${package_list[@]}"
+      return 0
+    fi
     echo "DRY RUN: would install $tool"
     return 0
   fi

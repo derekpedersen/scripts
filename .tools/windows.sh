@@ -88,6 +88,7 @@ install_windows() {
         ;;
       golang)
         install_winget_if_missing "GoLang.Go" "go"
+        install_go_dev_packages "go"
         ;;
       kubectl)
         install_winget_if_missing "Kubernetes.kubectl" "kubectl"

@@ -97,6 +97,8 @@ install_mac() {
         ;;
       golang)
         install_brew_formula_if_missing "go"
+        export PATH="$PATH:/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin"
+        install_go_dev_packages "go"
         ;;
       nvm)
         echo "Installing nvm..."

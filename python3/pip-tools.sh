@@ -5,44 +5,42 @@
 # ============================================================
 #
 # Purpose:
-#   Keep a single reviewable list of Python tooling packages and
-#   support review/install flows without changing the central
-#   installer bundle.
+#   Review and install the canonical Python tool list used by the
+#   repo's shared installer without maintaining a second copy.
 #
 # Notes:
-#   Edit the PYTHON_TOOLS array to add or remove packages.
-#   This script installs packages with the current user's Python
-#   environment using pip.
+#   The canonical package list lives in .tools/common.sh. This script
+#   reads that list so manual review/install flows cannot drift from
+#   the repo's install bundle definitions.
 # ============================================================
 
 set -euo pipefail
 
-PYTHON_TOOLS=(
-  "pip-tools"
-  "pipx"
-  "virtualenv"
-  "black"
-  "ruff"
-  "mypy"
-  "pytest"
-  "pre-commit"
-  "requests"
-  "boto3"
-)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+source "$SCRIPT_DIR/../.tools/common.sh"
+
+PYTHON_PACKAGE_PROFILE="${PYTHON_PACKAGE_PROFILE:-full}"
+if [[ "$PYTHON_PACKAGE_PROFILE" == "core" ]]; then
+  PYTHON_TOOLS=("${PYTHON_CORE_PACKAGES[@]}")
+else
+  PYTHON_TOOLS=("${PYTHON_FULL_PACKAGES[@]}")
+fi
 
 usage() {
   cat <<'EOF'
-Usage: bash python3/pip-tools.sh [--list|--install|--dry-run|--help]
+Usage: bash python3/pip-tools.sh [--list|--install|--dry-run|--help|--core|--full]
 
-Review and install Python tools from a single manifest.
+Review and install Python tools from the repo's canonical manifest.
 
 Options:
   --list       Show the currently tracked Python tool list.
   --install    Install every tool in the manifest.
   --dry-run    Show what would be installed without installing it.
+  --core       Use the smaller core Python tool profile.
+  --full       Use the full Python tool profile.
   --help       Show this help text.
 
-To update the manifest, edit the PYTHON_TOOLS array at the top of this file.
+The tool list is sourced from .tools/common.sh to avoid drift.
 EOF
 }
 
@@ -93,6 +91,16 @@ install_tools() {
 
 main() {
   case "${1:-}" in
+    --core)
+      PYTHON_PACKAGE_PROFILE="core"
+      PYTHON_TOOLS=("${PYTHON_CORE_PACKAGES[@]}")
+      list_tools
+      ;;
+    --full)
+      PYTHON_PACKAGE_PROFILE="full"
+      PYTHON_TOOLS=("${PYTHON_FULL_PACKAGES[@]}")
+      list_tools
+      ;;
     --list)
       list_tools
       ;;

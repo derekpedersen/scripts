@@ -96,6 +96,8 @@ install_linux() {
           tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
           echo 'export PATH=$PATH:/usr/local/go/bin' >> "$HOME/.bashrc"
         fi
+        export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
+        install_go_dev_packages "go"
         ;;
       nvm)
         echo "Installing nvm..."
