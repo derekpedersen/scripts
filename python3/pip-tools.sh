@@ -23,13 +23,15 @@ source "$SCRIPT_DIR/packages.sh"
 PYTHON_PACKAGE_PROFILE="${PYTHON_PACKAGE_PROFILE:-full}"
 if [[ "$PYTHON_PACKAGE_PROFILE" == "core" ]]; then
   PYTHON_TOOLS=("${PYTHON_CORE_PACKAGES[@]}")
+elif [[ "$PYTHON_PACKAGE_PROFILE" == "ai" ]]; then
+  PYTHON_TOOLS=("${PYTHON_AI_PACKAGES[@]}")
 else
   PYTHON_TOOLS=("${PYTHON_FULL_PACKAGES[@]}")
 fi
 
 usage() {
   cat <<'EOF'
-Usage: bash python3/pip-tools.sh [--list|--install|--dry-run|--help|--core|--full]
+Usage: bash python3/pip-tools.sh [--list|--install|--dry-run|--help|--core|--full|--ai]
 
 Review and install Python tools from the repo's canonical manifest.
 
@@ -39,6 +41,7 @@ Options:
   --dry-run    Show what would be installed without installing it.
   --core       Use the smaller core Python tool profile.
   --full       Use the full Python tool profile.
+  --ai         Use the AI/agent Python tool profile.
   --help       Show this help text.
 
 The tool list is sourced from .tools/common.sh to avoid drift.
@@ -91,33 +94,71 @@ install_tools() {
 }
 
 main() {
-  case "${1:-}" in
-    --core)
-      PYTHON_PACKAGE_PROFILE="core"
-      PYTHON_TOOLS=("${PYTHON_CORE_PACKAGES[@]}")
+  local action=""
+  local profile="${PYTHON_PACKAGE_PROFILE:-full}"
+
+  for arg in "$@"; do
+    case "$arg" in
+      --core)
+        profile="core"
+        ;;
+      --full)
+        profile="full"
+        ;;
+      --ai)
+        profile="ai"
+        ;;
+      --list)
+        action="list"
+        ;;
+      --install)
+        action="install"
+        ;;
+      --dry-run)
+        action="dry-run"
+        ;;
+      --help|-h)
+        action="help"
+        ;;
+      "")
+        ;;
+      *)
+        echo "Unknown option: $arg" >&2
+        usage >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ -n "$profile" ]]; then
+    case "$profile" in
+      core)
+        PYTHON_PACKAGE_PROFILE="core"
+        PYTHON_TOOLS=("${PYTHON_CORE_PACKAGES[@]}")
+        ;;
+      ai)
+        PYTHON_PACKAGE_PROFILE="ai"
+        PYTHON_TOOLS=("${PYTHON_AI_PACKAGES[@]}")
+        ;;
+      full)
+        PYTHON_PACKAGE_PROFILE="full"
+        PYTHON_TOOLS=("${PYTHON_FULL_PACKAGES[@]}")
+        ;;
+    esac
+  fi
+
+  case "${action:-help}" in
+    list)
       list_tools
       ;;
-    --full)
-      PYTHON_PACKAGE_PROFILE="full"
-      PYTHON_TOOLS=("${PYTHON_FULL_PACKAGES[@]}")
-      list_tools
-      ;;
-    --list)
-      list_tools
-      ;;
-    --install)
+    install)
       install_tools
       ;;
-    --dry-run)
+    dry-run)
       dry_run
       ;;
-    --help|-h|"")
+    help|"")
       usage
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      usage >&2
-      exit 1
       ;;
   esac
 }

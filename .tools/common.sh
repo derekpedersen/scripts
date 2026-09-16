@@ -75,6 +75,8 @@ get_tool_package_list() {
       fi
       if [[ "$profile" == "core" ]]; then
         package_list=("${PYTHON_CORE_PACKAGES[@]}")
+      elif [[ "$profile" == "ai" ]]; then
+        package_list=("${PYTHON_AI_PACKAGES[@]}")
       else
         package_list=("${PYTHON_FULL_PACKAGES[@]}")
       fi
