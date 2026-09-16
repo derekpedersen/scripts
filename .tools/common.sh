@@ -63,45 +63,65 @@ FULL_BUNDLE=(
 COMMON_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 REPO_ROOT="$(cd "$COMMON_TOOLS_DIR/.." && pwd)"
 
-load_tool_package_manifest() {
+get_tool_package_list() {
   local tool_name="${1:-}"
+  local profile="${2:-full}"
+  local package_list=()
 
   case "$tool_name" in
     python3)
       if [[ -f "$REPO_ROOT/python3/packages.sh" ]]; then
         source "$REPO_ROOT/python3/packages.sh"
       fi
+      if [[ "$profile" == "core" ]]; then
+        package_list=("${PYTHON_CORE_PACKAGES[@]}")
+      else
+        package_list=("${PYTHON_FULL_PACKAGES[@]}")
+      fi
       ;;
     golang)
       if [[ -f "$REPO_ROOT/golang/packages.sh" ]]; then
         source "$REPO_ROOT/golang/packages.sh"
+      fi
+      if [[ "$profile" == "core" ]]; then
+        package_list=("${GO_CORE_PACKAGES[@]}")
+      else
+        package_list=("${GO_FULL_PACKAGES[@]}")
       fi
       ;;
     node)
       if [[ -f "$REPO_ROOT/node/packages.sh" ]]; then
         source "$REPO_ROOT/node/packages.sh"
       fi
+      if [[ "$profile" == "core" ]]; then
+        package_list=("${NODE_CORE_PACKAGES[@]}")
+      else
+        package_list=("${NODE_FULL_PACKAGES[@]}")
+      fi
+      ;;
+    *)
+      return 1
       ;;
   esac
+
+  if [[ ${#package_list[@]} -eq 0 ]]; then
+    return 1
+  fi
+
+  printf '%s\n' "${package_list[@]}"
 }
 
 install_python_dev_packages() {
-  load_tool_package_manifest "python3"
-
   local python_cmd="${1:-python3}"
   local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
   local package_list=()
 
-  if [[ -z "${PYTHON_CORE_PACKAGES[*]:-}" ]]; then
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] && package_list+=("$pkg")
+  done < <(get_tool_package_list "python3" "$package_profile") || {
     echo "Python package manifest not found."
     return 0
-  fi
-
-  if [[ "$package_profile" == "core" ]]; then
-    package_list=("${PYTHON_CORE_PACKAGES[@]}")
-  else
-    package_list=("${PYTHON_FULL_PACKAGES[@]}")
-  fi
+  }
 
   if ! command -v "$python_cmd" >/dev/null 2>&1; then
     echo "Python executable not found: $python_cmd"
@@ -120,22 +140,16 @@ install_python_dev_packages() {
 }
 
 install_go_dev_packages() {
-  load_tool_package_manifest "golang"
-
   local go_cmd="${1:-go}"
   local package_profile="${GO_PACKAGE_PROFILE:-full}"
   local package_list=()
 
-  if [[ -z "${GO_CORE_PACKAGES[*]:-}" ]]; then
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] && package_list+=("$pkg")
+  done < <(get_tool_package_list "golang" "$package_profile") || {
     echo "Go package manifest not found."
     return 0
-  fi
-
-  if [[ "$package_profile" == "core" ]]; then
-    package_list=("${GO_CORE_PACKAGES[@]}")
-  else
-    package_list=("${GO_FULL_PACKAGES[@]}")
-  fi
+  }
 
   if ! command -v "$go_cmd" >/dev/null 2>&1; then
     echo "Go executable not found: $go_cmd"
@@ -154,22 +168,16 @@ install_go_dev_packages() {
 }
 
 install_node_dev_packages() {
-  load_tool_package_manifest "node"
-
   local node_cmd="${1:-node}"
   local package_profile="${NODE_PACKAGE_PROFILE:-full}"
   local package_list=()
 
-  if [[ -z "${NODE_CORE_PACKAGES[*]:-}" ]]; then
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] && package_list+=("$pkg")
+  done < <(get_tool_package_list "node" "$package_profile") || {
     echo "Node package manifest not found."
     return 0
-  fi
-
-  if [[ "$package_profile" == "core" ]]; then
-    package_list=("${NODE_CORE_PACKAGES[@]}")
-  else
-    package_list=("${NODE_FULL_PACKAGES[@]}")
-  fi
+  }
 
   if ! command -v "$node_cmd" >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
     echo "Node or npm executable not found."

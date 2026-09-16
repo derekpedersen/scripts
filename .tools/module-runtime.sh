@@ -91,15 +91,15 @@ module_install() {
 
   if [[ "${DRY_RUN:-false}" == true ]]; then
     if [[ "$tool" == "python3" ]]; then
-      load_tool_package_manifest "python3"
       local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
       local package_list=()
 
-      if [[ "$package_profile" == "core" ]]; then
-        package_list=("${PYTHON_CORE_PACKAGES[@]}")
-      else
-        package_list=("${PYTHON_FULL_PACKAGES[@]}")
-      fi
+      while IFS= read -r pkg; do
+        [[ -n "$pkg" ]] && package_list+=("$pkg")
+      done < <(get_tool_package_list "python3" "$package_profile") || {
+        echo "DRY RUN: package manifest for python3 not found."
+        return 0
+      }
 
       echo "DRY RUN: would install python3"
       echo "DRY RUN: would install Python developer packages:"
@@ -107,15 +107,15 @@ module_install() {
       return 0
     fi
     if [[ "$tool" == "golang" ]]; then
-      load_tool_package_manifest "golang"
       local package_profile="${GO_PACKAGE_PROFILE:-full}"
       local package_list=()
 
-      if [[ "$package_profile" == "core" ]]; then
-        package_list=("${GO_CORE_PACKAGES[@]}")
-      else
-        package_list=("${GO_FULL_PACKAGES[@]}")
-      fi
+      while IFS= read -r pkg; do
+        [[ -n "$pkg" ]] && package_list+=("$pkg")
+      done < <(get_tool_package_list "golang" "$package_profile") || {
+        echo "DRY RUN: package manifest for golang not found."
+        return 0
+      }
 
       echo "DRY RUN: would install golang"
       echo "DRY RUN: would install Go developer packages:"
@@ -123,15 +123,15 @@ module_install() {
       return 0
     fi
     if [[ "$tool" == "node" ]]; then
-      load_tool_package_manifest "node"
       local package_profile="${NODE_PACKAGE_PROFILE:-full}"
       local package_list=()
 
-      if [[ "$package_profile" == "core" ]]; then
-        package_list=("${NODE_CORE_PACKAGES[@]}")
-      else
-        package_list=("${NODE_FULL_PACKAGES[@]}")
-      fi
+      while IFS= read -r pkg; do
+        [[ -n "$pkg" ]] && package_list+=("$pkg")
+      done < <(get_tool_package_list "node" "$package_profile") || {
+        echo "DRY RUN: package manifest for node not found."
+        return 0
+      }
 
       echo "DRY RUN: would install node"
       echo "DRY RUN: would install Node developer packages:"
