@@ -91,9 +91,18 @@ module_install() {
 
   if [[ "${DRY_RUN:-false}" == true ]]; then
     if [[ "$tool" == "python3" ]]; then
+      local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
+      local package_list=()
+
+      if [[ "$package_profile" == "core" ]]; then
+        package_list=("${PYTHON_CORE_PACKAGES[@]}")
+      else
+        package_list=("${PYTHON_FULL_PACKAGES[@]}")
+      fi
+
       echo "DRY RUN: would install python3"
       echo "DRY RUN: would install Python developer packages:"
-      printf '  - %s\n' "${PYTHON_DEV_PACKAGES[@]}"
+      printf '  - %s\n' "${package_list[@]}"
       return 0
     fi
     echo "DRY RUN: would install $tool"

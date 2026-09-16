@@ -60,7 +60,7 @@ FULL_BUNDLE=(
   rabbitmq
 )
 
-PYTHON_DEV_PACKAGES=(
+PYTHON_CORE_PACKAGES=(
   "pip-tools"
   "pipx"
   "virtualenv"
@@ -74,12 +74,57 @@ PYTHON_DEV_PACKAGES=(
   "numpy"
   "pandas"
   "jupyterlab"
+  "python-dotenv"
+)
+
+PYTHON_FULL_PACKAGES=(
+  "pip-tools"
+  "pipx"
+  "virtualenv"
+  "black"
+  "ruff"
+  "mypy"
+  "pytest"
+  "pytest-cov"
+  "pre-commit"
+  "requests"
+  "urllib3"
+  "httpx"
+  "boto3"
+  "botocore"
+  "pydantic"
+  "python-dotenv"
+  "numpy"
+  "pandas"
+  "polars"
   "scipy"
   "matplotlib"
+  "seaborn"
+  "jupyterlab"
+  "notebook"
+  "ipykernel"
+  "pyyaml"
+  "sqlalchemy"
+  "psycopg"
+  "redis"
+  "aiohttp"
+  "click"
+  "rich"
+  "typer"
+  "pandas-stubs"
+  "types-requests"
 )
 
 install_python_dev_packages() {
   local python_cmd="${1:-python3}"
+  local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
+  local package_list=()
+
+  if [[ "$package_profile" == "core" ]]; then
+    package_list=("${PYTHON_CORE_PACKAGES[@]}")
+  else
+    package_list=("${PYTHON_FULL_PACKAGES[@]}")
+  fi
 
   if ! command -v "$python_cmd" >/dev/null 2>&1; then
     echo "Python executable not found: $python_cmd"
@@ -87,14 +132,14 @@ install_python_dev_packages() {
   fi
 
   if [[ "${DRY_RUN:-false}" == true ]]; then
-    echo "DRY RUN: would install Python developer packages with $python_cmd"
-    printf '  - %s\n' "${PYTHON_DEV_PACKAGES[@]}"
+    echo "DRY RUN: would install Python developer packages with $python_cmd ($package_profile profile)"
+    printf '  - %s\n' "${package_list[@]}"
     return 0
   fi
 
-  echo "Installing Python developer packages via pip..."
+  echo "Installing Python developer packages via pip ($package_profile profile)..."
   "$python_cmd" -m pip install --user --upgrade pip setuptools wheel
-  "$python_cmd" -m pip install --user "${PYTHON_DEV_PACKAGES[@]}"
+  "$python_cmd" -m pip install --user "${package_list[@]}"
 }
 
 configure_git_identity() {
@@ -486,6 +531,15 @@ canonical_tool_name() {
     code)
       echo "vscode"
       ;;
+    python-core)
+      echo "python3"
+      ;;
+    python-full)
+      echo "python3"
+      ;;
+    python)
+      echo "python3"
+      ;;
     *)
       echo "$tool"
       ;;
@@ -501,6 +555,15 @@ expand_bundle_item() {
       ;;
     full|dev)
       printf '%s\n' "${FULL_BUNDLE[@]}"
+      ;;
+    python-core)
+      printf '%s\n' "python3"
+      ;;
+    python-full)
+      printf '%s\n' "python3"
+      ;;
+    python)
+      printf '%s\n' "python3"
       ;;
     services)
       printf '%s\n' "${SERVICES_BUNDLE[@]}"
