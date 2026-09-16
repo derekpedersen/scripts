@@ -77,7 +77,7 @@ for arg in "$@"; do
 done
 
 if [[ ${#args[@]} -eq 0 ]]; then
-  echo "Usage: $0 [default|full|dev|services|cloud|python|python-core|python-full|go|go-core|go-full|<tool> [tool ...]] [--dry-run]"
+  echo "Usage: $0 [default|full|dev|services|cloud|python|python-core|python-full|go|go-core|go-full|node|node-core|node-full|<tool> [tool ...]] [--dry-run]"
   echo "Bundled install options:"
   echo "  default     = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode"
   echo "  python      = python3 + broader data-science + notebook + API tooling (default Python alias)"
@@ -86,11 +86,14 @@ if [[ ${#args[@]} -eq 0 ]]; then
   echo "  go          = golang + broader Go developer tooling (gofumpt, staticcheck, go-swagger, golang-migrate, etc.)"
   echo "  go-core     = golang + core Go lint/test tooling"
   echo "  go-full     = golang + broader Go developer tooling"
+  echo "  node        = node + broader Node developer tooling (eslint, prettier, tsx, vite, vitest, etc.)"
+  echo "  node-core   = node + lean Node lint/test tooling"
+  echo "  node-full   = node + broader Node developer tooling"
   echo "  full/dev    = default + gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq"
   echo "  services    = postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka"
   echo "  cloud       = gcloud, aws, eksctl, az, doctl, jq, yq"
-  echo "Canonical tools: git, gpg, curl, wget, unzip, python3, python, python-core, python-full, nvm, node, golang, go, go-core, go-full, kubectl, helm, docker, dotnetcore, vscode, gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka, git-config, git-signing, ssh-key, identity"
-  echo "Legacy aliases (supported): kubernetes-cli->kubectl, google-cloud->gcloud, awscli->aws, azure|azure-cli->az, digitalocean|doks->doctl, dotnet->dotnetcore, code->vscode, python-dev->python-core, go-dev->go-core"
+  echo "Canonical tools: git, gpg, curl, wget, unzip, python3, python, python-core, python-full, nvm, node, node-core, node-full, golang, go, go-core, go-full, kubectl, helm, docker, dotnetcore, vscode, gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka, git-config, git-signing, ssh-key, identity"
+  echo "Legacy aliases (supported): kubernetes-cli->kubectl, google-cloud->gcloud, awscli->aws, azure|azure-cli->az, digitalocean|doks->doctl, dotnet->dotnetcore, code->vscode, python-dev->python-core, go-dev->go-core, node-dev->node-core"
   echo "Use canonical names in scripts and examples."
   echo "Git/GPG and SSH setup: export GIT_USER_NAME, GIT_USER_EMAIL, and optionally GPG_KEY_ID / SSH_KEY_EMAIL before running:"
   echo "  GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' GPG_KEY_ID='ABC123DEF456' $0 gpg git-config git-signing"
@@ -133,6 +136,7 @@ done < <(resolve_target_tools "${args[@]}")
 
 PYTHON_PACKAGE_PROFILE="full"
 GO_PACKAGE_PROFILE="full"
+NODE_PACKAGE_PROFILE="full"
 for arg in "${args[@]}"; do
   case "$arg" in
     python-core|python-dev)
@@ -146,6 +150,12 @@ for arg in "${args[@]}"; do
       ;;
     go-full|go)
       GO_PACKAGE_PROFILE="full"
+      ;;
+    node-core|node-dev)
+      NODE_PACKAGE_PROFILE="core"
+      ;;
+    node-full|node)
+      NODE_PACKAGE_PROFILE="full"
       ;;
   esac
 done
@@ -169,7 +179,7 @@ for tool in "${TARGET_LIST[@]}"; do
     continue
   fi
 
-  if ! DRY_RUN="$DRY_RUN" PYTHON_PACKAGE_PROFILE="$PYTHON_PACKAGE_PROFILE" GO_PACKAGE_PROFILE="$GO_PACKAGE_PROFILE" SCRIPTS_OS_OVERRIDE="${SCRIPTS_OS_OVERRIDE:-}" SCRIPTS_REPO="${SCRIPTS_REPO:-}" SCRIPTS_REF="${SCRIPTS_REF:-}" bash "$module_installer"; then
+  if ! DRY_RUN="$DRY_RUN" PYTHON_PACKAGE_PROFILE="$PYTHON_PACKAGE_PROFILE" GO_PACKAGE_PROFILE="$GO_PACKAGE_PROFILE" NODE_PACKAGE_PROFILE="$NODE_PACKAGE_PROFILE" SCRIPTS_OS_OVERRIDE="${SCRIPTS_OS_OVERRIDE:-}" SCRIPTS_REPO="${SCRIPTS_REPO:-}" SCRIPTS_REF="${SCRIPTS_REF:-}" bash "$module_installer"; then
     echo "Module install failed: $tool"
     failures=$((failures + 1))
   fi

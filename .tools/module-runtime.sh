@@ -120,6 +120,21 @@ module_install() {
       printf '  - %s\n' "${package_list[@]}"
       return 0
     fi
+    if [[ "$tool" == "node" ]]; then
+      local package_profile="${NODE_PACKAGE_PROFILE:-full}"
+      local package_list=()
+
+      if [[ "$package_profile" == "core" ]]; then
+        package_list=("${NODE_CORE_PACKAGES[@]}")
+      else
+        package_list=("${NODE_FULL_PACKAGES[@]}")
+      fi
+
+      echo "DRY RUN: would install node"
+      echo "DRY RUN: would install Node developer packages:"
+      printf '  - %s\n' "${package_list[@]}"
+      return 0
+    fi
     echo "DRY RUN: would install $tool"
     return 0
   fi

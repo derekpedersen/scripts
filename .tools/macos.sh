@@ -126,7 +126,9 @@ install_mac() {
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
+          export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version default 2>/dev/null || echo "$(nvm ls --no-colors default 2>/dev/null | tail -n 1 | awk '{print $1}' | tr -d 'v')")/bin"
         fi
+        install_node_dev_packages "node"
         ;;
       dotnetcore)
         install_brew_cask_if_missing "dotnet-sdk"

@@ -85,6 +85,7 @@ install_windows() {
         ;;
       node)
         install_winget_if_missing "OpenJS.NodeJS.LTS" "node"
+        install_node_dev_packages "node"
         ;;
       golang)
         install_winget_if_missing "GoLang.Go" "go"

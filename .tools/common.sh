@@ -115,6 +115,29 @@ PYTHON_FULL_PACKAGES=(
   "types-requests"
 )
 
+NODE_CORE_PACKAGES=(
+  "eslint"
+  "prettier"
+  "typescript"
+  "tsx"
+  "nodemon"
+  "@types/node"
+)
+
+NODE_FULL_PACKAGES=(
+  "eslint"
+  "prettier"
+  "typescript"
+  "tsx"
+  "nodemon"
+  "@types/node"
+  "vite"
+  "vitest"
+  "jest"
+  "eslint-config-prettier"
+  "npm-check-updates"
+)
+
 GO_CORE_PACKAGES=(
   "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
   "mvdan.cc/gofumpt@latest"
@@ -187,6 +210,32 @@ install_go_dev_packages() {
   echo "Installing Go developer packages via go install ($package_profile profile)..."
   export PATH="$PATH:$HOME/go/bin"
   "$go_cmd" install "${package_list[@]}"
+}
+
+install_node_dev_packages() {
+  local node_cmd="${1:-node}"
+  local package_profile="${NODE_PACKAGE_PROFILE:-full}"
+  local package_list=()
+
+  if [[ "$package_profile" == "core" ]]; then
+    package_list=("${NODE_CORE_PACKAGES[@]}")
+  else
+    package_list=("${NODE_FULL_PACKAGES[@]}")
+  fi
+
+  if ! command -v "$node_cmd" >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+    echo "Node or npm executable not found."
+    return 0
+  fi
+
+  if [[ "${DRY_RUN:-false}" == true ]]; then
+    echo "DRY RUN: would install Node developer packages with npm ($package_profile profile)"
+    printf '  - %s\n' "${package_list[@]}"
+    return 0
+  fi
+
+  echo "Installing Node developer packages via npm ($package_profile profile)..."
+  npm install --global "${package_list[@]}"
 }
 
 configure_git_identity() {
@@ -596,6 +645,15 @@ canonical_tool_name() {
     go|golang)
       echo "golang"
       ;;
+    node-core)
+      echo "node"
+      ;;
+    node-full)
+      echo "node"
+      ;;
+    node)
+      echo "node"
+      ;;
     *)
       echo "$tool"
       ;;
@@ -629,6 +687,15 @@ expand_bundle_item() {
       ;;
     go)
       printf '%s\n' "golang"
+      ;;
+    node-core)
+      printf '%s\n' "node"
+      ;;
+    node-full)
+      printf '%s\n' "node"
+      ;;
+    node)
+      printf '%s\n' "node"
       ;;
     services)
       printf '%s\n' "${SERVICES_BUNDLE[@]}"
