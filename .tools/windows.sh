@@ -78,15 +78,18 @@ install_windows() {
         ;;
       python3)
         install_winget_if_missing "Python.Python.3.12" "python"
+        install_python_dev_packages "python"
         ;;
       nvm)
         install_winget_if_missing "CoreyButler.NVMforWindows" "nvm"
         ;;
       node)
         install_winget_if_missing "OpenJS.NodeJS.LTS" "node"
+        install_node_dev_packages "node"
         ;;
       golang)
         install_winget_if_missing "GoLang.Go" "go"
+        install_go_dev_packages "go"
         ;;
       kubectl)
         install_winget_if_missing "Kubernetes.kubectl" "kubectl"

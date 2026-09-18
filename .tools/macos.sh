@@ -97,6 +97,8 @@ install_mac() {
         ;;
       golang)
         install_brew_formula_if_missing "go"
+        export PATH="$PATH:/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin"
+        install_go_dev_packages "go"
         ;;
       nvm)
         echo "Installing nvm..."
@@ -124,7 +126,9 @@ install_mac() {
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
+          export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version default 2>/dev/null || echo "$(nvm ls --no-colors default 2>/dev/null | tail -n 1 | awk '{print $1}' | tr -d 'v')")/bin"
         fi
+        install_node_dev_packages "node"
         ;;
       dotnetcore)
         install_brew_cask_if_missing "dotnet-sdk"
@@ -146,6 +150,7 @@ install_mac() {
         ;;
       python3)
         install_brew_formula_if_missing "python"
+        install_python_dev_packages "python3"
         ;;
       postgres)
         install_brew_formula_if_missing "postgresql@16"

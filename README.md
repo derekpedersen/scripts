@@ -75,6 +75,7 @@ The repo-root tool folders are intentionally atomized and individual: each packa
 
 - [AGENTS.md](AGENTS.md): repository agent guidance
 - [.github/copilot-instructions.md](.github/copilot-instructions.md): Copilot-specific conventions
+- [.github/dependabot.yml](.github/dependabot.yml): weekly dependency update checks for GitHub Actions, Docker, and Python packages
 
 ## Quick start
 
@@ -119,7 +120,7 @@ pwsh ./.tools/install.ps1 default
 bash ./.tools/install.sh default
 ```
 
-One-liner from GitHub (replace default with full, dev, services, or cloud):
+One-liner from GitHub (replace default with full, dev, services, cloud, or python-ai):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.tools/install.sh | bash -s -- default
@@ -163,6 +164,7 @@ The uninstall flow mirrors the install pattern: it is explicit, target-based, an
 - dev: alias of full
 - services: local data/service stack
 - cloud: cloud CLIs and JSON/YAML helpers
+- python-ai: Python AI/agent tooling stack with redis, rq, LangChain, OpenAI, Anthropic, and model tooling
 
 Bundle quick examples:
 
@@ -172,6 +174,7 @@ bash ./.tools/install.sh full
 bash ./.tools/install.sh dev
 bash ./.tools/install.sh services
 bash ./.tools/install.sh cloud
+bash ./.tools/install.sh python-ai
 ```
 
 Dry run example:
