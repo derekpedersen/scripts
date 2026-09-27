@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Overview
-This repository contains bash helper modules, local developer install scripts, and small operational automation for macOS and Debian-based Linux environments.
+This repository contains a tool shed of bash helper modules, local developer install scripts, and small operational automation for macOS and Debian-based Linux environments.
 
 ## Principles
 - Keep automation safe to rerun.

@@ -20,8 +20,8 @@ if [[ "${1:-}" == "--dry-run" ]]; then
 fi
 
 SHELL_NAME="${SHELL:-}"
-MARKER_BEGIN="# >>> scripts/bash helpers >>>"
-MARKER_END="# <<< scripts/bash helpers <<<"
+MARKER_BEGIN="# >>> tool-shed/bash helpers >>>"
+MARKER_END="# <<< tool-shed/bash helpers <<<"
 LEGACY_LINE="# Added by scripts/bash/install.sh"
 
 if [[ "$SHELL_NAME" == *"zsh"* ]]; then
@@ -69,12 +69,16 @@ remove_legacy_profile_block() {
   mv "$file.tmp" "$file"
 }
 
-HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
+HELPERS_FILE="${TOOL_SHED_HELPERS_FILE:-$HOME/.tool-shed-bash-helpers}"
+LEGACY_HELPERS_FILE="$HOME/.scripts-bash-helpers"
 
 if [[ "$DRY_RUN" == true ]]; then
   echo "DRY RUN: would remove the managed bash helper block from $PROFILE_FILE"
   if [[ -f "$HELPERS_FILE" ]]; then
     echo "DRY RUN: would delete $HELPERS_FILE"
+  fi
+  if [[ -f "$LEGACY_HELPERS_FILE" ]]; then
+    echo "DRY RUN: would delete $LEGACY_HELPERS_FILE"
   fi
   exit 0
 fi
@@ -86,6 +90,10 @@ fi
 
 if [[ -f "$HELPERS_FILE" ]]; then
   rm -f "$HELPERS_FILE"
+fi
+
+if [[ -f "$LEGACY_HELPERS_FILE" ]]; then
+  rm -f "$LEGACY_HELPERS_FILE"
 fi
 
 echo "Removed the managed bash helper block from $PROFILE_FILE"

@@ -1,7 +1,7 @@
 # Copilot instructions for this repo
 
 ## Project purpose
-This repository stores reusable shell helpers, DevOps bootstrap scripts, and small operational tooling for local development. The goal is to make common workflows fast, explicit, and easy to discover from the shell.
+This repository stores a curated tool shed of reusable shell helpers, DevOps bootstrap scripts, and small operational tooling for local development. The goal is to make common workflows fast, explicit, and easy to discover from the shell.
 
 ## Coding conventions
 - Prefer clear, readable shell scripting over clever one-liners.

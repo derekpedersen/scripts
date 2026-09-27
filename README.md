@@ -1,33 +1,35 @@
-# Scripts
+# Tool Shed
 
-Reusable shell helpers, DevOps bootstrap scripts, and small operational tooling for local development.
+Curated shell helpers, bootstrap installers, and small operational tooling for local development.
 
-## What this repo contains
+Think of this repo as a well-labeled shed: the helper loft holds shell shortcuts, the tool bench runs installs and uninstalls, and the service yard keeps local dependencies ready when you need them.
 
-- [.bash/README.md](.bash/README.md) for shell helper usage and conventions
-- [.tools/README.md](.tools/README.md) for the installer/runtime layer and bundle-based orchestration
-- [.services](.services) for isolated local Docker Compose service stacks
+## What’s in the shed
+
+- [.bash/README.md](.bash/README.md) for shell helper usage and the helper loft
+- [.tools/README.md](.tools/README.md) for the installer/runtime layer and the tool bench
+- [.services](.services) for isolated local Docker Compose service stacks in the service yard
 - [Makefile](Makefile) for shared build/test orchestration
 - [Jenkinsfile](Jenkinsfile) for CI entry points that call the shared Makefile targets
 
-This repo intentionally separates concerns into three domains:
+This repo intentionally separates concerns into three zones:
 
 | Domain | Location | Purpose |
 | --- | --- | --- |
-| Bash helpers | [.bash](.bash) | Shell bootstrap, helper installation, and shared bash snippets used across tool modules. |
-| Installer/runtime | [.tools](.tools) | Bundle orchestration, install/uninstall controllers, OS-specific logic, and shared runtime behavior. |
-| Local service stack | [.services](.services) | Docker Compose-based local dev services such as PostgreSQL, Redis, RabbitMQ, MongoDB, Grafana, and Prometheus. |
+| Helper loft | [.bash](.bash) | Shell bootstrap, helper installation, and shared bash snippets used across tool modules. |
+| Tool bench | [.tools](.tools) | Bundle orchestration, install/uninstall controllers, OS-specific logic, and shared runtime behavior. |
+| Service yard | [.services](.services) | Docker Compose-based local dev services such as PostgreSQL, Redis, RabbitMQ, MongoDB, Grafana, and Prometheus. |
 
-The repo-root tool folders are intentionally atomized and individual: each package such as [docker](docker), [kubectl](kubectl), [aws](aws), [gcloud](gcloud), and [git](git) owns its own install/uninstall flow plus any optional bash helpers or Windows shims.
+The repo-root tool folders are intentionally atomized and individual. Each package such as [docker](docker), [kubectl](kubectl), [aws](aws), [gcloud](gcloud), and [git](git) has its own hook on the wall: install, uninstall, and any optional bash helpers or Windows shims.
 
-## Folder catalog
+## Shed catalog
 
 | Folder | Abbrev. | Full name | What it is | Link |
 | --- | --- | --- | --- | --- |
-| [.bash](.bash) | Bash | Bash helper loader | Shell helper install/uninstall flow and shared bash snippets for local workflows. | [.bash/README.md](.bash/README.md) |
+| [.bash](.bash) | Bash | Bash helper loft | Shell helper install/uninstall flow and shared bash snippets for local workflows. | [.bash/README.md](.bash/README.md) |
 | [.github](.github) | GitHub | GitHub repo config | Repository automation, automation rules, and GitHub-specific guidance for contributors and Copilot. | [GitHub Docs](https://docs.github.com/) |
-| [.services](.services) | SVC | Local service stack | Docker Compose stack for PostgreSQL, Redis, RabbitMQ, MongoDB, and observability containers. | [.services/README.md](.services/README.md) |
-| [.tools](.tools) | Tools | Tool installer runtime | Bundle-based installer, OS-specific logic, and shared runtime for developer tooling. | [.tools/README.md](.tools/README.md) |
+| [.services](.services) | SVC | Local service yard | Docker Compose stack for PostgreSQL, Redis, RabbitMQ, MongoDB, and observability containers. | [.services/README.md](.services/README.md) |
+| [.tools](.tools) | Tools | Tool bench runtime | Bundle-based installer, OS-specific logic, and shared runtime for developer tooling. | [.tools/README.md](.tools/README.md) |
 | [aws](aws) | AWS | Amazon Web Services CLI | AWS CLI and AWS-specific helper scripts. | [AWS CLI](https://aws.amazon.com/cli/) |
 | [az](az) | Azure | Azure CLI | Microsoft Azure command-line tooling and convenience helpers. | [Azure CLI](https://learn.microsoft.com/cli/azure/) |
 | [clickhouse](clickhouse) | CH | ClickHouse | ClickHouse database installer and setup helpers. | [ClickHouse](https://clickhouse.com/) |
@@ -63,7 +65,7 @@ The repo-root tool folders are intentionally atomized and individual: each packa
 | [wget](wget) | Wget | GNU Wget | Command-line downloader for HTTP and HTTPS fetches. | [GNU Wget](https://www.gnu.org/software/wget/) |
 | [yq](yq) | yq | yq YAML processor | YAML processing and transformation helpers. | [yq](https://mikefarah.gitbook.io/yq/) |
 
-## Local services
+## Service yard
 
 - [.services/docker-compose.yml](.services/docker-compose.yml): isolated local stack for PostgreSQL, Redis, RabbitMQ, MongoDB, and optional observability services
 - [.services/local-dev.sh](.services/local-dev.sh): interactive preset-based launcher for starting and stopping the local stack
@@ -71,7 +73,7 @@ The repo-root tool folders are intentionally atomized and individual: each packa
 - [.services/prometheus](.services/prometheus): Prometheus config for the local observability stack
 - [.services/README.md](.services/README.md): stack usage notes and port references
 
-### Guidance and automation
+### Signage and guidance
 
 - [AGENTS.md](AGENTS.md): repository agent guidance
 - [.github/copilot-instructions.md](.github/copilot-instructions.md): Copilot-specific conventions
@@ -79,7 +81,17 @@ The repo-root tool folders are intentionally atomized and individual: each packa
 
 ## Quick start
 
-### Install Bash helpers
+### Use the root installer prompt
+
+From this repo:
+
+```bash
+./install.sh
+```
+
+This interactive wrapper asks whether to run bash helper install and tools install, then delegates to the existing installers.
+
+### Open the helper loft
 
 From this repo:
 
@@ -90,19 +102,19 @@ bash ./.bash/install.sh
 One-liner from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.bash/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.bash/install.sh | bash
 ```
 
-The installer concatenates the selected helper files into a single managed file (`~/.scripts-bash-helpers`) and sources it from your shell profile. The profile only references that stable file, so helpers keep working even if the repo clone or bootstrap temp directory is removed. Rerun the installer to update the helpers.
+The installer gathers the selected helper files into a single managed file (`~/.tool-shed-bash-helpers`) and sources it from your shell profile. The profile only references that stable file, so the helpers keep working even if the repo clone or bootstrap temp directory is removed. Rerun the installer whenever you want to restock the shelf.
 
 Optional overrides for testing another branch or fork, or changing the managed helpers file:
 
 ```bash
-SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.bash/install.sh | bash
-SCRIPTS_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.bash/install.sh | bash
+TOOL_SHED_REF=feature/my-branch TOOL_SHED_REPO=derekpedersen/tool-shed curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.bash/install.sh | bash
+TOOL_SHED_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.bash/install.sh | bash
 ```
 
-### Install developer tools
+### Load the tool bench
 
 From this repo:
 
@@ -123,24 +135,24 @@ bash ./.tools/install.sh default
 One-liner from GitHub (replace default with full, dev, services, cloud, or python-ai):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.tools/install.sh | bash -s -- default
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- default
 ```
 
 Optional override for testing another branch or fork during bootstrap:
 
 ```bash
-SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.tools/install.sh | bash -s -- default
+TOOL_SHED_REF=feature/my-branch TOOL_SHED_REPO=derekpedersen/tool-shed curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- default
 ```
 
-### Uninstall Bash helpers
+### Close the doors
 
 ```bash
 bash ./.bash/uninstall.sh
 ```
 
-This removes the managed source block from your shell profile and deletes the generated helper file (`~/.scripts-bash-helpers`).
+This removes the managed source block from your shell profile and deletes the generated helper file (`~/.tool-shed-bash-helpers`).
 
-### Uninstall developer tools
+### Pack up the tools
 
 ```bash
 bash ./.tools/uninstall.sh default
@@ -157,7 +169,7 @@ pwsh ./.tools/uninstall.ps1 docker vscode --dry-run
 
 The uninstall flow mirrors the install pattern: it is explicit, target-based, and safe by default.
 
-## Tool installer bundles
+## Tool bundles
 
 - default: core developer setup
 - full: default plus broader dev, cloud tooling, and local services
@@ -192,7 +204,7 @@ SSH_KEY_EMAIL='jane@example.com' bash ./.tools/install.sh ssh-key
 bash ./.tools/install.sh identity
 ```
 
-## CI behavior
+## Workshop checks
 
 
 The shared CI entry points are:
@@ -200,7 +212,7 @@ The shared CI entry points are:
 - `make build` for syntax checks and Helm version stamping validation
 - `make test` for installer smoke tests, including install and uninstall dry-run coverage
 
-[Jenkinsfile](Jenkinsfile) now calls those same targets so local runs and CI stay aligned.
+[Jenkinsfile](Jenkinsfile) calls those same targets so local runs and CI stay aligned.
 
 Build/test coverage includes:
 
