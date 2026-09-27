@@ -81,6 +81,16 @@ The repo-root tool folders are intentionally atomized and individual. Each packa
 
 ## Quick start
 
+### Use the root installer prompt
+
+From this repo:
+
+```bash
+./install.sh
+```
+
+This interactive wrapper asks whether to run bash helper install and tools install, then delegates to the existing installers.
+
 ### Open the helper loft
 
 From this repo:
