@@ -60,6 +60,142 @@ FULL_BUNDLE=(
   rabbitmq
 )
 
+COMMON_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+REPO_ROOT="$(cd "$COMMON_TOOLS_DIR/.." && pwd)"
+
+get_tool_package_list() {
+  local tool_name="${1:-}"
+  local profile="${2:-full}"
+  local package_list=()
+
+  case "$tool_name" in
+    python3)
+      if [[ -f "$REPO_ROOT/python3/packages.sh" ]]; then
+        source "$REPO_ROOT/python3/packages.sh"
+      fi
+      if [[ "$profile" == "core" ]]; then
+        package_list=("${PYTHON_CORE_PACKAGES[@]}")
+      elif [[ "$profile" == "ai" ]]; then
+        package_list=("${PYTHON_AI_PACKAGES[@]}")
+      else
+        package_list=("${PYTHON_FULL_PACKAGES[@]}")
+      fi
+      ;;
+    golang)
+      if [[ -f "$REPO_ROOT/golang/packages.sh" ]]; then
+        source "$REPO_ROOT/golang/packages.sh"
+      fi
+      if [[ "$profile" == "core" ]]; then
+        package_list=("${GO_CORE_PACKAGES[@]}")
+      else
+        package_list=("${GO_FULL_PACKAGES[@]}")
+      fi
+      ;;
+    node)
+      if [[ -f "$REPO_ROOT/node/packages.sh" ]]; then
+        source "$REPO_ROOT/node/packages.sh"
+      fi
+      if [[ "$profile" == "core" ]]; then
+        package_list=("${NODE_CORE_PACKAGES[@]}")
+      else
+        package_list=("${NODE_FULL_PACKAGES[@]}")
+      fi
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  if [[ ${#package_list[@]} -eq 0 ]]; then
+    return 1
+  fi
+
+  printf '%s\n' "${package_list[@]}"
+}
+
+install_python_dev_packages() {
+  local python_cmd="${1:-python3}"
+  local package_profile="${PYTHON_PACKAGE_PROFILE:-full}"
+  local package_list=()
+
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] && package_list+=("$pkg")
+  done < <(get_tool_package_list "python3" "$package_profile") || {
+    echo "Python package manifest not found."
+    return 0
+  }
+
+  if ! command -v "$python_cmd" >/dev/null 2>&1; then
+    echo "Python executable not found: $python_cmd"
+    return 0
+  fi
+
+  if [[ "${DRY_RUN:-false}" == true ]]; then
+    echo "DRY RUN: would install Python developer packages with $python_cmd ($package_profile profile)"
+    printf '  - %s\n' "${package_list[@]}"
+    return 0
+  fi
+
+  echo "Installing Python developer packages via pip ($package_profile profile)..."
+  "$python_cmd" -m pip install --user --upgrade pip setuptools wheel
+  "$python_cmd" -m pip install --user "${package_list[@]}"
+}
+
+install_go_dev_packages() {
+  local go_cmd="${1:-go}"
+  local package_profile="${GO_PACKAGE_PROFILE:-full}"
+  local package_list=()
+
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] && package_list+=("$pkg")
+  done < <(get_tool_package_list "golang" "$package_profile") || {
+    echo "Go package manifest not found."
+    return 0
+  }
+
+  if ! command -v "$go_cmd" >/dev/null 2>&1; then
+    echo "Go executable not found: $go_cmd"
+    return 0
+  fi
+
+  if [[ "${DRY_RUN:-false}" == true ]]; then
+    echo "DRY RUN: would install Go developer packages with $go_cmd ($package_profile profile)"
+    printf '  - %s\n' "${package_list[@]}"
+    return 0
+  fi
+
+  echo "Installing Go developer packages via go install ($package_profile profile)..."
+  export PATH="$PATH:$HOME/go/bin"
+  "$go_cmd" install "${package_list[@]}"
+}
+
+install_node_dev_packages() {
+  local node_cmd="${1:-node}"
+  local package_profile="${NODE_PACKAGE_PROFILE:-full}"
+  local package_list=()
+
+  while IFS= read -r pkg; do
+    [[ -n "$pkg" ]] && package_list+=("$pkg")
+  done < <(get_tool_package_list "node" "$package_profile") || {
+    echo "Node package manifest not found."
+    return 0
+  }
+
+  if ! command -v "$node_cmd" >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+    echo "Node or npm executable not found."
+    return 0
+  fi
+
+  if [[ "${DRY_RUN:-false}" == true ]]; then
+    echo "DRY RUN: would install Node developer packages with npm ($package_profile profile)"
+    printf '  - %s\n' "${package_list[@]}"
+    return 0
+  fi
+
+  echo "Installing Node developer packages via npm ($package_profile profile)..."
+  npm install --global "${package_list[@]}"
+}
+
 configure_git_identity() {
   local name="${GIT_USER_NAME:-}"
   local email="${GIT_USER_EMAIL:-}"
@@ -449,6 +585,33 @@ canonical_tool_name() {
     code)
       echo "vscode"
       ;;
+    python-core)
+      echo "python3"
+      ;;
+    python-full)
+      echo "python3"
+      ;;
+    python)
+      echo "python3"
+      ;;
+    go-core)
+      echo "golang"
+      ;;
+    go-full)
+      echo "golang"
+      ;;
+    go|golang)
+      echo "golang"
+      ;;
+    node-core)
+      echo "node"
+      ;;
+    node-full)
+      echo "node"
+      ;;
+    node)
+      echo "node"
+      ;;
     *)
       echo "$tool"
       ;;
@@ -464,6 +627,33 @@ expand_bundle_item() {
       ;;
     full|dev)
       printf '%s\n' "${FULL_BUNDLE[@]}"
+      ;;
+    python-core)
+      printf '%s\n' "python3"
+      ;;
+    python-full)
+      printf '%s\n' "python3"
+      ;;
+    python)
+      printf '%s\n' "python3"
+      ;;
+    go-core)
+      printf '%s\n' "golang"
+      ;;
+    go-full)
+      printf '%s\n' "golang"
+      ;;
+    go)
+      printf '%s\n' "golang"
+      ;;
+    node-core)
+      printf '%s\n' "node"
+      ;;
+    node-full)
+      printf '%s\n' "node"
+      ;;
+    node)
+      printf '%s\n' "node"
       ;;
     services)
       printf '%s\n' "${SERVICES_BUNDLE[@]}"

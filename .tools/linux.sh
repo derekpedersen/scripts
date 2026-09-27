@@ -96,6 +96,8 @@ install_linux() {
           tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"
           echo 'export PATH=$PATH:/usr/local/go/bin' >> "$HOME/.bashrc"
         fi
+        export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
+        install_go_dev_packages "go"
         ;;
       nvm)
         echo "Installing nvm..."
@@ -123,7 +125,9 @@ install_linux() {
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
+          export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version default 2>/dev/null || echo "$(nvm ls --no-colors default 2>/dev/null | tail -n 1 | awk '{print $1}' | tr -d 'v')")/bin"
         fi
+        install_node_dev_packages "node"
         ;;
       dotnetcore)
         install_apt_pkg_if_missing "wget" "wget"
@@ -240,6 +244,8 @@ install_linux() {
         ;;
       python3)
         install_apt_pkg_if_missing "python3" "python3"
+        install_apt_pkg_if_missing "python3-pip" "pip3"
+        install_python_dev_packages "python3"
         ;;
       postgres)
         install_apt_pkg_if_missing "postgresql" "pg_ctl"
