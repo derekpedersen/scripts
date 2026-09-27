@@ -62,21 +62,26 @@ if [[ ! -f "$SCRIPT_DIR/.bash/install.sh" || ! -f "$SCRIPT_DIR/.tools/install.sh
   exit $?
 fi
 
+HAS_TTY=false
+if [[ -r /dev/tty && -w /dev/tty ]]; then
+  HAS_TTY=true
+fi
+
 confirm() {
   local prompt="$1"
   local default="${2:-y}"
   local answer
 
-  if [[ ! -t 0 ]]; then
+  if [[ "$HAS_TTY" != true ]]; then
     [[ "$default" == "y" ]]
     return
   fi
 
   if [[ "$default" == "y" ]]; then
-    read -r -p "$prompt [Y/n]: " answer
+    read -r -u 3 -p "$prompt [Y/n]: " answer
     answer="${answer:-Y}"
   else
-    read -r -p "$prompt [y/N]: " answer
+    read -r -u 3 -p "$prompt [y/N]: " answer
     answer="${answer:-N}"
   fi
 
@@ -90,15 +95,19 @@ pick_tools_target() {
   local target="${1:-default}"
   local input
 
-  if [[ ! -t 0 ]]; then
+  if [[ "$HAS_TTY" != true ]]; then
     printf '%s\n' "$target"
     return
   fi
 
-  echo "Choose tools install target (default/full/dev/services/cloud/python-ai or specific tools):"
-  read -r -p "Target [default]: " input
+  echo "Choose tools install target (default/full/dev/services/cloud/python-ai or specific tools):" > /dev/tty
+  read -r -u 3 -p "Target [default]: " input
   printf '%s\n' "${input:-$target}"
 }
+
+if [[ "$HAS_TTY" == true ]]; then
+  exec 3<>/dev/tty
+fi
 
 run_bash=false
 run_tools=false
@@ -129,3 +138,7 @@ if [[ "$run_tools" == true ]]; then
 fi
 
 echo "Root install flow complete."
+
+if [[ "$HAS_TTY" == true ]]; then
+  exec 3>&-
+fi
