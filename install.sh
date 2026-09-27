@@ -15,7 +15,51 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+bootstrap_from_github() {
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "curl is required to bootstrap installer files from GitHub."
+    return 1
+  fi
+
+  local repo="${TOOL_SHED_REPO:-derekpedersen/tool-shed}"
+  local ref="${TOOL_SHED_REF:-main}"
+  local tmpdir
+  local archive
+  local extracted_dir
+  local rc
+
+  tmpdir="$(mktemp -d)"
+  archive="$tmpdir/tool-shed.tar.gz"
+
+  echo "Bootstrapping tool-shed root installer from github.com/$repo ($ref)..."
+  curl -fsSL "https://codeload.github.com/$repo/tar.gz/refs/heads/$ref" -o "$archive"
+  tar -xzf "$archive" -C "$tmpdir"
+
+  extracted_dir="$(find "$tmpdir" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+  if [[ -z "$extracted_dir" || ! -f "$extracted_dir/install.sh" ]]; then
+    echo "Bootstrap failed: could not find install.sh in downloaded archive."
+    rm -rf "$tmpdir"
+    return 1
+  fi
+
+  TOOL_SHED_BOOTSTRAPPED=1 TOOL_SHED_REF="$ref" TOOL_SHED_REPO="$repo" bash "$extracted_dir/install.sh" "$@"
+  rc=$?
+  rm -rf "$tmpdir"
+  return $rc
+}
+
+# BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+
+if [[ ! -f "$SCRIPT_DIR/.bash/install.sh" || ! -f "$SCRIPT_DIR/.tools/install.sh" ]]; then
+  if [[ "${TOOL_SHED_BOOTSTRAPPED:-0}" == "1" ]]; then
+    echo "Required installer files are missing from $SCRIPT_DIR and bootstrap already ran."
+    exit 1
+  fi
+
+  bootstrap_from_github "$@"
+  exit $?
+fi
 
 confirm() {
   local prompt="$1"

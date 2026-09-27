@@ -89,6 +89,12 @@ From this repo:
 ./install.sh
 ```
 
+One-liner from GitHub:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/install.sh | bash
+```
+
 This interactive wrapper asks whether to run bash helper install and tools install, then delegates to the existing installers.
 
 ### Open the helper loft
