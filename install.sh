@@ -48,8 +48,9 @@ bootstrap_from_github() {
   return $rc
 }
 
-# BASH_SOURCE is unset when piped via curl; fall back to cwd so bootstrap runs.
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
+# BASH_SOURCE can be unavailable when piped via curl; use $0 as a fallback.
+SCRIPT_PATH="${BASH_SOURCE:-$0}"
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 if [[ ! -f "$SCRIPT_DIR/.bash/install.sh" || ! -f "$SCRIPT_DIR/.tools/install.sh" ]]; then
   if [[ "${TOOL_SHED_BOOTSTRAPPED:-0}" == "1" ]]; then
