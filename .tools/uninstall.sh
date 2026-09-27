@@ -24,7 +24,7 @@ fi
 
 source "$SCRIPT_DIR/common.sh"
 
-OS="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
+OS="${TOOL_SHED_OS_OVERRIDE:-$(uname -s)}"
 case "$OS" in
   Darwin|Linux)
     PLATFORM="unix"
@@ -544,7 +544,7 @@ for tool in "${TARGET_LIST[@]}"; do
     continue
   fi
 
-  if ! DRY_RUN="$DRY_RUN" SCRIPTS_OS_OVERRIDE="${SCRIPTS_OS_OVERRIDE:-}" bash "$module_uninstaller"; then
+  if ! DRY_RUN="$DRY_RUN" TOOL_SHED_OS_OVERRIDE="${TOOL_SHED_OS_OVERRIDE:-}" bash "$module_uninstaller"; then
     echo "Module uninstall failed: $tool"
     failures=$((failures + 1))
   fi

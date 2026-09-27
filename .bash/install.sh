@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # The installer concatenates the selected helper files into a single managed
-# file next to the user's shell profile (e.g. ~/.scripts-bash-helpers) and
+# file next to the user's shell profile (e.g. ~/.tool-shed-bash-helpers) and
 # sources that file from the profile. This keeps the profile self-contained:
 # no external repo path or temp directory is referenced after install.
 
@@ -12,17 +12,17 @@ bootstrap_from_github() {
     return 1
   fi
 
-  local repo="${SCRIPTS_REPO:-derekpedersen/scripts}"
-  local ref="${SCRIPTS_REF:-main}"
+  local repo="${TOOL_SHED_REPO:-derekpedersen/tool-shed}"
+  local ref="${TOOL_SHED_REF:-main}"
   local tmpdir
   local archive
   local extracted_dir
   local rc
 
   tmpdir="$(mktemp -d)"
-  archive="$tmpdir/scripts.tar.gz"
+  archive="$tmpdir/tool-shed.tar.gz"
 
-  echo "Bootstrapping bash helper installer from github.com/$repo ($ref)..."
+  echo "Bootstrapping tool-shed bash helper installer from github.com/$repo ($ref)..."
   curl -fsSL "https://codeload.github.com/$repo/tar.gz/refs/heads/$ref" -o "$archive"
   tar -xzf "$archive" -C "$tmpdir"
 
@@ -33,7 +33,7 @@ bootstrap_from_github() {
     return 1
   fi
 
-  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/.bash/install.sh" "$@"
+  TOOL_SHED_BOOTSTRAPPED=1 TOOL_SHED_REF="$ref" TOOL_SHED_REPO="$repo" bash "$extracted_dir/.bash/install.sh" "$@"
   rc=$?
   rm -rf "$tmpdir"
   return $rc
@@ -43,12 +43,12 @@ bootstrap_from_github() {
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SHELL_NAME="${SHELL:-}"
-MARKER_BEGIN="# >>> scripts/bash helpers >>>"
-MARKER_END="# <<< scripts/bash helpers <<<"
+MARKER_BEGIN="# >>> tool-shed/bash helpers >>>"
+MARKER_END="# <<< tool-shed/bash helpers <<<"
 LEGACY_LINE="# Added by scripts/bash/install.sh"
 
 if ! find "$REPO_ROOT" -mindepth 2 -maxdepth 2 -type f -name 'bash.sh' | grep -q .; then
-  if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
+  if [[ "${TOOL_SHED_BOOTSTRAPPED:-0}" == "1" ]]; then
     echo "No helper modules found in $REPO_ROOT and bootstrap already ran."
     exit 1
   fi
@@ -230,12 +230,13 @@ fi
 
 selected_list="${selected_files[*]}"
 
-# Managed helpers file lives next to the profile (e.g. ~/.scripts-bash-helpers)
-HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
+# Managed helpers file lives next to the profile (e.g. ~/.tool-shed-bash-helpers)
+HELPERS_FILE="${TOOL_SHED_HELPERS_FILE:-$HOME/.tool-shed-bash-helpers}"
+LEGACY_HELPERS_FILE="$HOME/.scripts-bash-helpers"
 
 {
-  echo "# Managed by scripts/.bash/install.sh. Do not edit directly."
-  echo "# Rerun the installer to update: https://github.com/derekpedersen/scripts"
+  echo "# Managed by tool-shed/.bash/install.sh. Do not edit directly."
+  echo "# Rerun the installer to update: https://github.com/derekpedersen/tool-shed"
   echo "# selected: $selected_list"
   echo
   for selected in ${selected_files[@]+"${selected_files[@]}"}; do
@@ -251,6 +252,10 @@ HELPERS_FILE="${SCRIPTS_HELPERS_FILE:-$HOME/.scripts-bash-helpers}"
     fi
   done
 } > "$HELPERS_FILE"
+
+if [[ -f "$LEGACY_HELPERS_FILE" ]]; then
+  rm -f "$LEGACY_HELPERS_FILE"
+fi
 
 SOURCE_BLOCK=$(cat <<EOF
 

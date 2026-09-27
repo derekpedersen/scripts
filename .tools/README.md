@@ -1,4 +1,4 @@
-# tools
+# Tool Bench
 
 Installer/runtime layer for the repo's bundle-based tool installation flow.
 

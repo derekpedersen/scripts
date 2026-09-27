@@ -20,17 +20,17 @@ bootstrap_from_github() {
     return 1
   fi
 
-  local repo="${SCRIPTS_REPO:-derekpedersen/scripts}"
-  local ref="${SCRIPTS_REF:-main}"
+  local repo="${TOOL_SHED_REPO:-derekpedersen/tool-shed}"
+  local ref="${TOOL_SHED_REF:-main}"
   local tmpdir
   local archive
   local extracted_dir
   local rc
 
   tmpdir="$(mktemp -d)"
-  archive="$tmpdir/scripts.tar.gz"
+  archive="$tmpdir/tool-shed.tar.gz"
 
-  echo "Bootstrapping tools installer from github.com/$repo ($ref)..."
+  echo "Bootstrapping tool-shed installer from github.com/$repo ($ref)..."
   curl -fsSL "https://codeload.github.com/$repo/tar.gz/refs/heads/$ref" -o "$archive"
   tar -xzf "$archive" -C "$tmpdir"
 
@@ -41,7 +41,7 @@ bootstrap_from_github() {
     return 1
   fi
 
-  SCRIPTS_BOOTSTRAPPED=1 SCRIPTS_REF="$ref" SCRIPTS_REPO="$repo" bash "$extracted_dir/.tools/install.sh" "$@"
+  TOOL_SHED_BOOTSTRAPPED=1 TOOL_SHED_REF="$ref" TOOL_SHED_REPO="$repo" bash "$extracted_dir/.tools/install.sh" "$@"
   rc=$?
   rm -rf "$tmpdir"
   return $rc
@@ -52,7 +52,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 if [[ ! -f "$SCRIPT_DIR/common.sh" || ! -f "$SCRIPT_DIR/module-runtime.sh" || ! -f "$REPO_ROOT/git/install.sh" ]]; then
-  if [[ "${SCRIPTS_BOOTSTRAPPED:-0}" == "1" ]]; then
+  if [[ "${TOOL_SHED_BOOTSTRAPPED:-0}" == "1" ]]; then
     echo "Required installer files are missing from $SCRIPT_DIR and bootstrap already ran."
     exit 1
   fi
@@ -183,7 +183,7 @@ for tool in "${TARGET_LIST[@]}"; do
     continue
   fi
 
-  if ! DRY_RUN="$DRY_RUN" PYTHON_PACKAGE_PROFILE="$PYTHON_PACKAGE_PROFILE" GO_PACKAGE_PROFILE="$GO_PACKAGE_PROFILE" NODE_PACKAGE_PROFILE="$NODE_PACKAGE_PROFILE" SCRIPTS_OS_OVERRIDE="${SCRIPTS_OS_OVERRIDE:-}" SCRIPTS_REPO="${SCRIPTS_REPO:-}" SCRIPTS_REF="${SCRIPTS_REF:-}" bash "$module_installer"; then
+  if ! DRY_RUN="$DRY_RUN" PYTHON_PACKAGE_PROFILE="$PYTHON_PACKAGE_PROFILE" GO_PACKAGE_PROFILE="$GO_PACKAGE_PROFILE" NODE_PACKAGE_PROFILE="$NODE_PACKAGE_PROFILE" TOOL_SHED_OS_OVERRIDE="${TOOL_SHED_OS_OVERRIDE:-}" TOOL_SHED_REPO="${TOOL_SHED_REPO:-}" TOOL_SHED_REF="${TOOL_SHED_REF:-}" bash "$module_installer"; then
     echo "Module install failed: $tool"
     failures=$((failures + 1))
   fi

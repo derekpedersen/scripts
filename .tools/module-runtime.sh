@@ -25,7 +25,7 @@ fi
 
 source "$TOOLS_DIR/common.sh"
 
-OS_NAME="${SCRIPTS_OS_OVERRIDE:-$(uname -s)}"
+OS_NAME="${TOOL_SHED_OS_OVERRIDE:-$(uname -s)}"
 PLATFORM=""
 case "$OS_NAME" in
   Darwin)

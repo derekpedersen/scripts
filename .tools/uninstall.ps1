@@ -16,12 +16,12 @@ if (-not $bashCommand) {
     ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
     if (-not $gitBash) {
-        throw 'Git Bash is required to run the repo uninstaller. Install Git for Windows or ensure bash is on PATH.'
+        throw 'Git Bash is required to run the tool-shed uninstaller. Install Git for Windows or ensure bash is on PATH.'
     }
 
     $bashCommand = [pscustomobject]@{ Source = $gitBash }
 }
 
-$env:SCRIPTS_OS_OVERRIDE = 'Windows_NT'
+$env:TOOL_SHED_OS_OVERRIDE = 'Windows_NT'
 & $bashCommand.Source $scriptPath @args
 exit $LASTEXITCODE

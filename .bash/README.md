@@ -1,12 +1,12 @@
-# Bashful
+# Tool Shed Bash
 
-> A small collection of useful Bash functions and shortcuts for Git, Docker, and Kubernetes.
+> A tidy rack of Bash helpers for Git, Docker, and Kubernetes.
 
-**Bashful** is a collection of practical Bash helpers for everyday development. It keeps commonly used commands close at hand without requiring you to remember long command-line incantations.
+**Tool Shed Bash** keeps the helpers you reach for often in one easy-to-find place instead of scattering them across your shell setup.
 
-The goal is simple: **less typing, fewer mistakes, faster workflows.**
+The goal is simple: **less hunting, fewer mistakes, faster workflows.**
 
-## What's Included
+## What’s in the rack
 
 | Area          | What you'll find                                                  |
 | ------------- | ----------------------------------------------------------------- |
@@ -15,7 +15,7 @@ The goal is simple: **less typing, fewer mistakes, faster workflows.**
 | ☸️ Kubernetes | Contexts, namespaces, pods, logs, debugging, rollouts             |
 | 🛠️ Bash      | Small utilities for navigation, processes, ports, and development |
 
-## Quick Start
+## Open the shed
 
 The preferred method is to install the auto-loader into your shell profile. This keeps the helpers available in every new terminal session without manually sourcing files.
 
@@ -28,13 +28,13 @@ bash ./.bash/install.sh
 Or install directly from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.bash/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.bash/install.sh | bash
 ```
 
 To test another branch or fork during bootstrap:
 
 ```bash
-SCRIPTS_REF=feature/my-branch SCRIPTS_REPO=derekpedersen/scripts curl -fsSL https://raw.githubusercontent.com/derekpedersen/scripts/main/.bash/install.sh | bash
+TOOL_SHED_REF=feature/my-branch TOOL_SHED_REPO=derekpedersen/tool-shed curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.bash/install.sh | bash
 ```
 
 The installer is interactive and module-aware. It scans repo-root modules for `bash.sh` files and asks which ones you want enabled, such as:
@@ -65,9 +65,9 @@ source ~/.bash_profile
 
 Once loaded, the selected helpers are automatically sourced for you.
 
-## Docker
+## Docker bay
 
-Bashful provides shortcuts for common Docker workflows.
+Tool Shed Bash provides shortcuts for common Docker workflows.
 
 ### Containers
 
@@ -113,7 +113,7 @@ Continue? [y/N]
 
 `docker-clean-all` performs an aggressive cleanup of unused Docker resources, including volumes.
 
-## Kubernetes
+## Kubernetes hook
 
 Kubernetes helpers focus on the commands you tend to type repeatedly while developing and troubleshooting.
 
@@ -170,7 +170,7 @@ khealth
 kdebug
 ```
 
-For interactive workflows, Bashful can optionally use [`fzf`](https://github.com/junegunn/fzf):
+For interactive workflows, Tool Shed Bash can optionally use [`fzf`](https://github.com/junegunn/fzf):
 
 ```bash
 kpod
@@ -180,7 +180,7 @@ kpod-logs
 
 These let you select a pod interactively instead of copying and pasting pod names.
 
-## Git
+## Git bench
 
 Git helpers make common repository operations a little quicker.
 
@@ -200,7 +200,7 @@ git-clean-merged
 
 ## Philosophy
 
-Bashful follows a few simple principles:
+Tool Shed Bash follows a few simple principles:
 
 ### Keep commands discoverable
 
@@ -244,10 +244,10 @@ Optional tools such as `fzf` are detected rather than required for the entire co
 
 ## Directory Structure
 
-A typical Bashful repository looks like:
+A typical Tool Shed Bash repository looks like:
 
 ```text
-bashful/
+tool-shed/
 ├── README.md
 ├── git.sh
 ├── docker.sh
@@ -259,7 +259,7 @@ Additional helper files can be added as the collection grows.
 
 ## Shell Compatibility
 
-Bashful is designed for **Bash**.
+Tool Shed Bash is designed for **Bash**.
 
 It is primarily intended for:
 
@@ -277,7 +277,7 @@ Some commands depend on tools being installed separately, such as:
 
 ## Safety
 
-Bashful includes commands capable of deleting local data.
+Tool Shed Bash includes commands capable of deleting local data.
 
 In particular:
 
@@ -298,7 +298,7 @@ docker-clean-disk-usage
 
 ## Customization
 
-Bashful is intentionally just Bash.
+Tool Shed Bash is intentionally just Bash.
 
 Fork it, remove commands you don't use, change aliases, add your own functions, and adapt it to your workflow.
 
@@ -326,7 +326,7 @@ Good additions are:
 
 Avoid adding large frameworks or dependencies unless there is a compelling reason.
 
-If a command can be expressed clearly with a small Bash function, that's usually the Bashful way.
+If a command can be expressed clearly with a small Bash function, that's usually the Tool Shed Bash way.
 
 ## License
 
@@ -334,4 +334,4 @@ MIT License
 
 ---
 
-**Bashful** — because your terminal shouldn't make you type the same thing twice.
+**Tool Shed Bash** — because your terminal shouldn't make you type the same thing twice.
