@@ -14,22 +14,6 @@ set -euo pipefail
 #   whenever adding or changing install options.
 # ============================================================
 
-DEFAULT_BUNDLE=(
-  git
-  curl
-  wget
-  unzip
-  python3
-  nvm
-  node
-  golang
-  kubectl
-  helm
-  docker
-  dotnetcore
-  vscode
-)
-
 FULL_BUNDLE=(
   git
   curl
@@ -44,7 +28,6 @@ FULL_BUNDLE=(
   docker
   dotnetcore
   vscode
-  code
   gcloud
   aws
   eksctl
@@ -58,9 +41,45 @@ FULL_BUNDLE=(
   clickhouse
   mongodb
   rabbitmq
+  elasticsearch
+  kafka
 )
 
-AI_TOOLS_BUNDLE=(
+CLOUD_BUNDLE=(
+  git
+  curl
+  wget
+  unzip
+  python3
+  nvm
+  node
+  golang
+  kubectl
+  helm
+  docker
+  dotnetcore
+  vscode
+  gcloud
+  aws
+  eksctl
+  doctl
+  az
+  jq
+  yq
+)
+
+SERVICES_BUNDLE=(
+  postgres
+  redis
+  mysql
+  clickhouse
+  mongodb
+  rabbitmq
+  elasticsearch
+  kafka
+)
+
+AI_BUNDLE=(
   git
   curl
   wget
@@ -536,27 +555,6 @@ configure_identity_interactive() {
   fi
 }
 
-SERVICES_BUNDLE=(
-  postgres
-  redis
-  mysql
-  clickhouse
-  mongodb
-  rabbitmq
-  elasticsearch
-  kafka
-)
-
-CLOUD_BUNDLE=(
-  gcloud
-  aws
-  eksctl
-  doctl
-  az
-  jq
-  yq
-)
-
 ensure_root_or_sudo() {
   if [[ "$(id -u)" -eq 0 ]]; then
     SUDO=""
@@ -649,14 +647,11 @@ expand_bundle_item() {
   local item="$1"
 
   case "$item" in
-    default)
-      printf '%s\n' "${DEFAULT_BUNDLE[@]}"
-      ;;
-    full|dev)
+    full)
       printf '%s\n' "${FULL_BUNDLE[@]}"
       ;;
-    ai-tools)
-      printf '%s\n' "${AI_TOOLS_BUNDLE[@]}"
+    ai)
+      printf '%s\n' "${AI_BUNDLE[@]}"
       ;;
     python-core)
       printf '%s\n' "python3"
@@ -691,11 +686,11 @@ expand_bundle_item() {
     node)
       printf '%s\n' "node"
       ;;
-    services)
-      printf '%s\n' "${SERVICES_BUNDLE[@]}"
-      ;;
     cloud)
       printf '%s\n' "${CLOUD_BUNDLE[@]}"
+      ;;
+    services)
+      printf '%s\n' "${SERVICES_BUNDLE[@]}"
       ;;
     *)
       printf '%s\n' "$item"

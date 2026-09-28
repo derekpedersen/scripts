@@ -45,13 +45,13 @@ esac
 
 usage() {
   cat <<'EOF'
-Usage: bash ./.tools/uninstall.sh [default|full|dev|services|cloud|<tool> [tool ...]] [--dry-run]
+Usage: bash ./.tools/uninstall.sh [full|cloud|services|ai|<tool> [tool ...]] [--dry-run]
 
 Bundle targets:
-  default  = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode
-  full/dev = default + gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq
-  services = postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka
-  cloud    = gcloud, aws, eksctl, az, doctl, jq, yq
+  full  = base tools + cloud CLIs + data/service tools
+  cloud = base tools + kubernetes/docker/cloud CLIs + jq/yq
+  services = local data/service tools only
+  ai    = base tools + AI package profiles for python/go/node
 
 Canonical tools:
   git, gpg, curl, wget, unzip, python3, nvm, node, golang, kubectl, helm, docker,
@@ -66,9 +66,10 @@ Legacy aliases (supported):
 Use canonical names in scripts and examples.
 
 Examples:
-  bash ./.tools/uninstall.sh default
-  bash ./.tools/uninstall.sh kubectl docker --dry-run
+  bash ./.tools/uninstall.sh full
   bash ./.tools/uninstall.sh services
+  bash ./.tools/uninstall.sh kubectl docker --dry-run
+  bash ./.tools/uninstall.sh ai
 EOF
 }
 
@@ -86,26 +87,36 @@ for arg in "$@"; do
 done
 
 if [[ ${#args[@]} -eq 0 ]]; then
-  usage
-  exit 1
+  args=("full")
+  echo "No uninstall target provided. Defaulting to: full"
 fi
+
+for arg in "${args[@]}"; do
+  case "$arg" in
+    default|dev|ai-tools)
+      echo "Unsupported bundle name: $arg"
+      echo "Supported bundles are: full, cloud, services, ai"
+      exit 1
+      ;;
+  esac
+done
 
 INTERNAL_MODE="${TOOLS_UNINSTALL_MODULE_INTERNAL:-0}"
 
 expand_bundle() {
   local item="$1"
   case "$item" in
-    default)
-      printf '%s\n' "${DEFAULT_BUNDLE[@]}"
-      ;;
-    full|dev)
+    full)
       printf '%s\n' "${FULL_BUNDLE[@]}"
+      ;;
+    cloud)
+      printf '%s\n' "${CLOUD_BUNDLE[@]}"
       ;;
     services)
       printf '%s\n' "${SERVICES_BUNDLE[@]}"
       ;;
-    cloud)
-      printf '%s\n' "${CLOUD_BUNDLE[@]}"
+    ai)
+      printf '%s\n' "${AI_BUNDLE[@]}"
       ;;
     *)
       printf '%s\n' "$item"

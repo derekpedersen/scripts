@@ -77,26 +77,19 @@ for arg in "$@"; do
 done
 
 if [[ ${#args[@]} -eq 0 ]]; then
-  echo "Usage: $0 [default|ai-tools|services|cloud|<tool> [tool ...]] [--dry-run]"
-  echo "Install options:"
-  echo "  default     = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode"
-  echo "  ai-tools    = default + python-ai + go-ai + node-full"
-  echo "  services    = postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka"
-  echo "  cloud       = gcloud, aws, eksctl, az, doctl, jq, yq"
-  echo "Run ./install.sh for guided language-by-language selection."
-  echo "Git/GPG and SSH setup: export GIT_USER_NAME, GIT_USER_EMAIL, and optionally GPG_KEY_ID / SSH_KEY_EMAIL before running:"
-  echo "  GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' GPG_KEY_ID='ABC123DEF456' $0 gpg git-config git-signing"
-  echo "  SSH_KEY_EMAIL='jane@example.com' $0 ssh-key"
-  echo "  GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' SSH_KEY_EMAIL='jane@example.com' $0 identity"
-  echo "Interactive setup: $0 identity"
-  echo "Examples:"
-  echo "  $0 default"
-  echo "  $0 ai-tools"
-  echo "  $0 services"
-  echo "  $0 cloud"
-  echo "  $0 git kubectl docker"
-  exit 1
+  args=("full")
+  echo "No install target provided. Defaulting to: full"
 fi
+
+for arg in "${args[@]}"; do
+  case "$arg" in
+    default|dev|ai-tools)
+      echo "Unsupported bundle name: $arg"
+      echo "Supported bundles are: full, cloud, services, ai"
+      exit 1
+      ;;
+  esac
+done
 
 if [[ " ${args[*]:-} " == *" git-signing "* ]]; then
   if ! printf '%s\n' "${args[@]}" | grep -qx 'gpg'; then
@@ -136,7 +129,7 @@ for arg in "${args[@]}"; do
     python-ai)
       PYTHON_PACKAGE_PROFILE="ai"
       ;;
-    ai-tools)
+    ai)
       PYTHON_PACKAGE_PROFILE="ai"
       GO_PACKAGE_PROFILE="ai"
       NODE_PACKAGE_PROFILE="full"

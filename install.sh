@@ -92,7 +92,7 @@ confirm() {
 }
 
 pick_tools_target() {
-  local target="${1:-default}"
+  local target="${1:-full}"
   local mode=""
 
   if [[ "$HAS_TTY" != true ]]; then
@@ -101,28 +101,38 @@ pick_tools_target() {
   fi
 
   echo "Tools install mode:" > /dev/tty
-  echo "  1) all (default)" > /dev/tty
-  echo "  2) ai-tools" > /dev/tty
-  echo "  3) Prompt by language" > /dev/tty
+  echo "  1) full (default)" > /dev/tty
+  echo "  2) cloud" > /dev/tty
+  echo "  3) services" > /dev/tty
+  echo "  4) ai" > /dev/tty
+  echo "  5) Prompt by language" > /dev/tty
   read -r -u 3 -p "Mode [1]: " mode
   mode="${mode:-1}"
 
   case "$mode" in
     1)
-      printf '%s\n' "default"
+      printf '%s\n' "full"
       return
       ;;
     2)
-      printf '%s\n' "ai-tools"
+      printf '%s\n' "cloud"
       return
       ;;
     3)
+      printf '%s\n' "services"
+      return
+      ;;
+    4)
+      printf '%s\n' "ai"
+      return
+      ;;
+    5)
       pick_language_targets
       return
       ;;
     *)
-      echo "Unknown mode: $mode. Falling back to default target." > /dev/tty
-      printf '%s\n' "default"
+      echo "Unknown mode: $mode. Falling back to full target." > /dev/tty
+      printf '%s\n' "full"
       return
       ;;
   esac
@@ -168,18 +178,18 @@ pick_language_targets() {
 
   case "$py_profile" in
     all) targets+=("python-full") ;;
-    ai-tools) targets+=("python-ai") ;;
+    ai) targets+=("python-ai") ;;
     skip) ;;
   esac
 
   case "$go_profile" in
     all) targets+=("go-full") ;;
-    ai-tools) targets+=("go-ai") ;;
+    ai) targets+=("go-ai") ;;
     skip) ;;
   esac
 
   case "$node_profile" in
-    all|ai-tools) targets+=("node-full") ;;
+    all|ai) targets+=("node-full") ;;
     skip) ;;
   esac
 
@@ -190,10 +200,10 @@ pick_package_set() {
   local language="$1"
   local input
 
-  read -r -u 3 -p "$language package set (all/ai-tools) [all]: " input
+  read -r -u 3 -p "$language package set (all/ai) [all]: " input
   input="${input:-all}"
 
-  if [[ "$input" == "all" || "$input" == "ai-tools" ]]; then
+  if [[ "$input" == "all" || "$input" == "ai" ]]; then
     printf '%s\n' "$input"
     return
   fi
@@ -208,7 +218,7 @@ fi
 
 run_bash=false
 run_tools=false
-tools_target="${1:-default}"
+tools_target="${1:-full}"
 
 if confirm "Run bash helper install?" "y"; then
   run_bash=true
