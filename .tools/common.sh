@@ -60,6 +60,25 @@ FULL_BUNDLE=(
   rabbitmq
 )
 
+AI_TOOLS_BUNDLE=(
+  git
+  curl
+  wget
+  unzip
+  python3
+  nvm
+  node
+  golang
+  kubectl
+  helm
+  docker
+  dotnetcore
+  vscode
+  python-ai
+  go-ai
+  node-full
+)
+
 COMMON_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
 REPO_ROOT="$(cd "$COMMON_TOOLS_DIR/.." && pwd)"
 
@@ -635,6 +654,9 @@ expand_bundle_item() {
       ;;
     full|dev)
       printf '%s\n' "${FULL_BUNDLE[@]}"
+      ;;
+    ai-tools)
+      printf '%s\n' "${AI_TOOLS_BUNDLE[@]}"
       ;;
     python-core)
       printf '%s\n' "python3"

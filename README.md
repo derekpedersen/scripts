@@ -138,7 +138,7 @@ pwsh ./.tools/install.ps1 default
 bash ./.tools/install.sh default
 ```
 
-One-liner from GitHub (replace default with full, dev, services, cloud, or python-ai):
+One-liner from GitHub (replace default with ai-tools, services, or cloud):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- default
@@ -178,29 +178,29 @@ The uninstall flow mirrors the install pattern: it is explicit, target-based, an
 ## Tool bundles
 
 - default: core developer setup
-- full: default plus broader dev, cloud tooling, and local services
-- dev: alias of full
+- ai-tools: default plus AI-focused language tooling for Python and Go, plus the broader Node toolset
 - services: local data/service stack
 - cloud: cloud CLIs and JSON/YAML helpers
-- python-ai: Python AI/agent tooling stack with redis/rq, LangChain, OpenAI/Anthropic, FastAPI/Uvicorn, and model tooling
-- go-ai: Go AI/agent-adjacent tooling stack with goimports, grpcurl, and mockery
+
+For language-by-language tool selection, run the guided root installer:
+
+```bash
+./install.sh
+```
 
 Bundle quick examples:
 
 ```bash
 bash ./.tools/install.sh default
-bash ./.tools/install.sh full
-bash ./.tools/install.sh dev
+bash ./.tools/install.sh ai-tools
 bash ./.tools/install.sh services
 bash ./.tools/install.sh cloud
-bash ./.tools/install.sh python-ai
-bash ./.tools/install.sh go-ai
 ```
 
 Dry run example:
 
 ```bash
-bash ./.tools/install.sh full --dry-run
+bash ./.tools/install.sh ai-tools --dry-run
 ```
 
 Identity setup examples:

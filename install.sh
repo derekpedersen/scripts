@@ -94,7 +94,6 @@ confirm() {
 pick_tools_target() {
   local target="${1:-default}"
   local mode=""
-  local input
 
   if [[ "$HAS_TTY" != true ]]; then
     printf '%s\n' "$target"
@@ -102,43 +101,57 @@ pick_tools_target() {
   fi
 
   echo "Tools install mode:" > /dev/tty
-  echo "  1) Default tools + all language stacks" > /dev/tty
-  echo "  2) Prompt for each language profile" > /dev/tty
-  echo "  3) Custom target(s)" > /dev/tty
+  echo "  1) all (default)" > /dev/tty
+  echo "  2) ai-tools" > /dev/tty
+  echo "  3) Prompt by language" > /dev/tty
   read -r -u 3 -p "Mode [1]: " mode
   mode="${mode:-1}"
 
   case "$mode" in
     1)
-      printf '%s\n' "$target"
+      printf '%s\n' "default"
       return
       ;;
     2)
-      pick_language_targets
+      printf '%s\n' "ai-tools"
       return
       ;;
     3)
-      echo "Choose tools install target (default/full/dev/services/cloud/python-ai/go-ai or specific tools):" > /dev/tty
-      read -r -u 3 -p "Target [default]: " input
-      printf '%s\n' "${input:-$target}"
+      pick_language_targets
       return
       ;;
     *)
       echo "Unknown mode: $mode. Falling back to default target." > /dev/tty
-      printf '%s\n' "$target"
+      printf '%s\n' "default"
       return
       ;;
   esac
 }
 
 pick_language_targets() {
-  local py_profile
-  local go_profile
-  local node_profile
+  local py_profile="skip"
+  local go_profile="skip"
+  local node_profile="skip"
+  local selected_any=false
 
-  py_profile="$(pick_language_profile "Python" "full" "core/full/ai/skip" "^(core|full|ai|skip)$")"
-  go_profile="$(pick_language_profile "Go" "full" "core/full/ai/skip" "^(core|full|ai|skip)$")"
-  node_profile="$(pick_language_profile "Node" "full" "core/full/skip" "^(core|full|skip)$")"
+  if confirm "Install Python language tools?" "y"; then
+    py_profile="$(pick_package_set "Python")"
+    selected_any=true
+  fi
+
+  if confirm "Install Go language tools?" "y"; then
+    go_profile="$(pick_package_set "Go")"
+    selected_any=true
+  fi
+
+  if confirm "Install Node language tools?" "y"; then
+    node_profile="$(pick_package_set "Node")"
+    selected_any=true
+  fi
+
+  if [[ "$selected_any" != true ]]; then
+    echo "No language tools selected. Installing base non-language tool set." > /dev/tty
+  fi
 
   local targets=(
     git
@@ -154,45 +167,39 @@ pick_language_targets() {
   )
 
   case "$py_profile" in
-    core) targets+=("python-core") ;;
-    full) targets+=("python-full") ;;
-    ai) targets+=("python-ai") ;;
+    all) targets+=("python-full") ;;
+    ai-tools) targets+=("python-ai") ;;
     skip) ;;
   esac
 
   case "$go_profile" in
-    core) targets+=("go-core") ;;
-    full) targets+=("go-full") ;;
-    ai) targets+=("go-ai") ;;
+    all) targets+=("go-full") ;;
+    ai-tools) targets+=("go-ai") ;;
     skip) ;;
   esac
 
   case "$node_profile" in
-    core) targets+=("node-core") ;;
-    full) targets+=("node-full") ;;
+    all|ai-tools) targets+=("node-full") ;;
     skip) ;;
   esac
 
   printf '%s\n' "${targets[*]}"
 }
 
-pick_language_profile() {
+pick_package_set() {
   local language="$1"
-  local default_profile="$2"
-  local options="$3"
-  local allowed_pattern="$4"
   local input
 
-  read -r -u 3 -p "$language profile ($options) [$default_profile]: " input
-  input="${input:-$default_profile}"
+  read -r -u 3 -p "$language package set (all/ai-tools) [all]: " input
+  input="${input:-all}"
 
-  if [[ "$input" =~ $allowed_pattern ]]; then
+  if [[ "$input" == "all" || "$input" == "ai-tools" ]]; then
     printf '%s\n' "$input"
     return
   fi
 
-  echo "Unknown profile '$input' for $language. Using $default_profile." > /dev/tty
-  printf '%s\n' "$default_profile"
+  echo "Unknown package set '$input' for $language. Using all." > /dev/tty
+  printf '%s\n' "all"
 }
 
 if [[ "$HAS_TTY" == true ]]; then
