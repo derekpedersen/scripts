@@ -87,6 +87,8 @@ get_tool_package_list() {
       fi
       if [[ "$profile" == "core" ]]; then
         package_list=("${GO_CORE_PACKAGES[@]}")
+      elif [[ "$profile" == "ai" ]]; then
+        package_list=("${GO_AI_PACKAGES[@]}")
       else
         package_list=("${GO_FULL_PACKAGES[@]}")
       fi
@@ -591,6 +593,9 @@ canonical_tool_name() {
     python-full)
       echo "python3"
       ;;
+    python-ai)
+      echo "python3"
+      ;;
     python)
       echo "python3"
       ;;
@@ -598,6 +603,9 @@ canonical_tool_name() {
       echo "golang"
       ;;
     go-full)
+      echo "golang"
+      ;;
+    go-ai)
       echo "golang"
       ;;
     go|golang)
@@ -634,6 +642,9 @@ expand_bundle_item() {
     python-full)
       printf '%s\n' "python3"
       ;;
+    python-ai)
+      printf '%s\n' "python3"
+      ;;
     python)
       printf '%s\n' "python3"
       ;;
@@ -641,6 +652,9 @@ expand_bundle_item() {
       printf '%s\n' "golang"
       ;;
     go-full)
+      printf '%s\n' "golang"
+      ;;
+    go-ai)
       printf '%s\n' "golang"
       ;;
     go)

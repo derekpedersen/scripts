@@ -182,7 +182,8 @@ The uninstall flow mirrors the install pattern: it is explicit, target-based, an
 - dev: alias of full
 - services: local data/service stack
 - cloud: cloud CLIs and JSON/YAML helpers
-- python-ai: Python AI/agent tooling stack with redis, rq, LangChain, OpenAI, Anthropic, and model tooling
+- python-ai: Python AI/agent tooling stack with redis/rq, LangChain, OpenAI/Anthropic, FastAPI/Uvicorn, and model tooling
+- go-ai: Go AI/agent-adjacent tooling stack with goimports, grpcurl, and mockery
 
 Bundle quick examples:
 
@@ -193,6 +194,7 @@ bash ./.tools/install.sh dev
 bash ./.tools/install.sh services
 bash ./.tools/install.sh cloud
 bash ./.tools/install.sh python-ai
+bash ./.tools/install.sh go-ai
 ```
 
 Dry run example:

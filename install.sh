@@ -93,6 +93,7 @@ confirm() {
 
 pick_tools_target() {
   local target="${1:-default}"
+  local mode=""
   local input
 
   if [[ "$HAS_TTY" != true ]]; then
@@ -100,9 +101,98 @@ pick_tools_target() {
     return
   fi
 
-  echo "Choose tools install target (default/full/dev/services/cloud/python-ai or specific tools):" > /dev/tty
-  read -r -u 3 -p "Target [default]: " input
-  printf '%s\n' "${input:-$target}"
+  echo "Tools install mode:" > /dev/tty
+  echo "  1) Default tools + all language stacks" > /dev/tty
+  echo "  2) Prompt for each language profile" > /dev/tty
+  echo "  3) Custom target(s)" > /dev/tty
+  read -r -u 3 -p "Mode [1]: " mode
+  mode="${mode:-1}"
+
+  case "$mode" in
+    1)
+      printf '%s\n' "$target"
+      return
+      ;;
+    2)
+      pick_language_targets
+      return
+      ;;
+    3)
+      echo "Choose tools install target (default/full/dev/services/cloud/python-ai/go-ai or specific tools):" > /dev/tty
+      read -r -u 3 -p "Target [default]: " input
+      printf '%s\n' "${input:-$target}"
+      return
+      ;;
+    *)
+      echo "Unknown mode: $mode. Falling back to default target." > /dev/tty
+      printf '%s\n' "$target"
+      return
+      ;;
+  esac
+}
+
+pick_language_targets() {
+  local py_profile
+  local go_profile
+  local node_profile
+
+  py_profile="$(pick_language_profile "Python" "full" "core/full/ai/skip" "^(core|full|ai|skip)$")"
+  go_profile="$(pick_language_profile "Go" "full" "core/full/ai/skip" "^(core|full|ai|skip)$")"
+  node_profile="$(pick_language_profile "Node" "full" "core/full/skip" "^(core|full|skip)$")"
+
+  local targets=(
+    git
+    curl
+    wget
+    unzip
+    nvm
+    kubectl
+    helm
+    docker
+    dotnetcore
+    vscode
+  )
+
+  case "$py_profile" in
+    core) targets+=("python-core") ;;
+    full) targets+=("python-full") ;;
+    ai) targets+=("python-ai") ;;
+    skip) ;;
+  esac
+
+  case "$go_profile" in
+    core) targets+=("go-core") ;;
+    full) targets+=("go-full") ;;
+    ai) targets+=("go-ai") ;;
+    skip) ;;
+  esac
+
+  case "$node_profile" in
+    core) targets+=("node-core") ;;
+    full) targets+=("node-full") ;;
+    skip) ;;
+  esac
+
+  printf '%s\n' "${targets[*]}"
+}
+
+pick_language_profile() {
+  local language="$1"
+  local default_profile="$2"
+  local options="$3"
+  local allowed_pattern="$4"
+  local input
+
+  read -r -u 3 -p "$language profile ($options) [$default_profile]: " input
+  input="${input:-$default_profile}"
+
+  if [[ "$input" =~ $allowed_pattern ]]; then
+    printf '%s\n' "$input"
+    return
+  fi
+
+  echo "Unknown profile '$input' for $language. Using $default_profile." > /dev/tty
+  printf '%s\n' "$default_profile"
 }
 
 if [[ "$HAS_TTY" == true ]]; then
