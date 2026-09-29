@@ -77,39 +77,19 @@ for arg in "$@"; do
 done
 
 if [[ ${#args[@]} -eq 0 ]]; then
-  echo "Usage: $0 [default|full|dev|services|cloud|python|python-core|python-full|python-ai|go|go-core|go-full|node|node-core|node-full|<tool> [tool ...]] [--dry-run]"
-  echo "Bundled install options:"
-  echo "  default     = git, curl, wget, python3, nvm, node, golang, kubectl, helm, docker, dotnetcore, vscode"
-  echo "  python      = python3 + broader data-science + notebook + API tooling (default Python alias)"
-  echo "  python-core = python3 + lean Python dev tooling (lint/test/data basics)"
-  echo "  python-full = python3 + broader data-science + notebook + API tooling"
-  echo "  python-ai   = python3 + AI/agent tooling (redis, rq, langchain, openai, anthropic, ollama)"
-  echo "  go          = golang + broader Go developer tooling (gofumpt, staticcheck, go-swagger, golang-migrate, etc.)"
-  echo "  go-core     = golang + core Go lint/test tooling"
-  echo "  go-full     = golang + broader Go developer tooling"
-  echo "  node        = node + broader Node developer tooling (eslint, prettier, tsx, vite, vitest, etc.)"
-  echo "  node-core   = node + lean Node lint/test tooling"
-  echo "  node-full   = node + broader Node developer tooling"
-  echo "  full/dev    = default + gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq"
-  echo "  services    = postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka"
-  echo "  cloud       = gcloud, aws, eksctl, az, doctl, jq, yq"
-  echo "Canonical tools: git, gpg, curl, wget, unzip, python3, python, python-core, python-full, python-ai, nvm, node, node-core, node-full, golang, go, go-core, go-full, kubectl, helm, docker, dotnetcore, vscode, gcloud, aws, eksctl, az, doctl, jq, yq, postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka, git-config, git-signing, ssh-key, identity"
-  echo "Legacy aliases (supported): kubernetes-cli->kubectl, google-cloud->gcloud, awscli->aws, azure|azure-cli->az, digitalocean|doks->doctl, dotnet->dotnetcore, code->vscode, python-dev->python-core, go-dev->go-core, node-dev->node-core"
-  echo "Use canonical names in scripts and examples."
-  echo "Git/GPG and SSH setup: export GIT_USER_NAME, GIT_USER_EMAIL, and optionally GPG_KEY_ID / SSH_KEY_EMAIL before running:"
-  echo "  GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' GPG_KEY_ID='ABC123DEF456' $0 gpg git-config git-signing"
-  echo "  SSH_KEY_EMAIL='jane@example.com' $0 ssh-key"
-  echo "  GIT_USER_NAME='Jane Doe' GIT_USER_EMAIL='jane@example.com' SSH_KEY_EMAIL='jane@example.com' $0 identity"
-  echo "Interactive setup: $0 identity"
-  echo "Examples:"
-  echo "  $0 default"
-  echo "  $0 full"
-  echo "  $0 services"
-  echo "  $0 cloud"
-  echo "  $0 git nvm kubectl helm docker"
-  echo "  $0 gcloud aws eksctl az doctl"
-  exit 1
+  args=("full")
+  echo "No install target provided. Defaulting to: full"
 fi
+
+for arg in "${args[@]}"; do
+  case "$arg" in
+    default|dev|ai-tools)
+      echo "Unsupported bundle name: $arg"
+      echo "Supported bundles are: full, cloud, services, ai"
+      exit 1
+      ;;
+  esac
+done
 
 if [[ " ${args[*]:-} " == *" git-signing "* ]]; then
   if ! printf '%s\n' "${args[@]}" | grep -qx 'gpg'; then
@@ -149,11 +129,19 @@ for arg in "${args[@]}"; do
     python-ai)
       PYTHON_PACKAGE_PROFILE="ai"
       ;;
+    ai)
+      PYTHON_PACKAGE_PROFILE="ai"
+      GO_PACKAGE_PROFILE="ai"
+      NODE_PACKAGE_PROFILE="full"
+      ;;
     go-core|go-dev)
       GO_PACKAGE_PROFILE="core"
       ;;
     go-full|go)
       GO_PACKAGE_PROFILE="full"
+      ;;
+    go-ai)
+      GO_PACKAGE_PROFILE="ai"
       ;;
     node-core|node-dev)
       NODE_PACKAGE_PROFILE="core"

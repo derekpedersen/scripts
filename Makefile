@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 .PHONY: build test all
 
-BUNDLES := default services cloud
+BUNDLES := full cloud services ai
 
 all: build test
 

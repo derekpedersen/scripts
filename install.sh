@@ -92,17 +92,124 @@ confirm() {
 }
 
 pick_tools_target() {
-  local target="${1:-default}"
-  local input
+  local target="${1:-full}"
+  local mode=""
 
   if [[ "$HAS_TTY" != true ]]; then
     printf '%s\n' "$target"
     return
   fi
 
-  echo "Choose tools install target (default/full/dev/services/cloud/python-ai or specific tools):" > /dev/tty
-  read -r -u 3 -p "Target [default]: " input
-  printf '%s\n' "${input:-$target}"
+  echo "Tools install mode:" > /dev/tty
+  echo "  1) full (default)" > /dev/tty
+  echo "  2) cloud" > /dev/tty
+  echo "  3) services" > /dev/tty
+  echo "  4) ai" > /dev/tty
+  echo "  5) Prompt by language" > /dev/tty
+  read -r -u 3 -p "Mode [1]: " mode
+  mode="${mode:-1}"
+
+  case "$mode" in
+    1)
+      printf '%s\n' "full"
+      return
+      ;;
+    2)
+      printf '%s\n' "cloud"
+      return
+      ;;
+    3)
+      printf '%s\n' "services"
+      return
+      ;;
+    4)
+      printf '%s\n' "ai"
+      return
+      ;;
+    5)
+      pick_language_targets
+      return
+      ;;
+    *)
+      echo "Unknown mode: $mode. Falling back to full target." > /dev/tty
+      printf '%s\n' "full"
+      return
+      ;;
+  esac
+}
+
+pick_language_targets() {
+  local py_profile="skip"
+  local go_profile="skip"
+  local node_profile="skip"
+  local selected_any=false
+
+  if confirm "Install Python language tools?" "y"; then
+    py_profile="$(pick_package_set "Python")"
+    selected_any=true
+  fi
+
+  if confirm "Install Go language tools?" "y"; then
+    go_profile="$(pick_package_set "Go")"
+    selected_any=true
+  fi
+
+  if confirm "Install Node language tools?" "y"; then
+    node_profile="$(pick_package_set "Node")"
+    selected_any=true
+  fi
+
+  if [[ "$selected_any" != true ]]; then
+    echo "No language tools selected. Installing base non-language tool set." > /dev/tty
+  fi
+
+  local targets=(
+    git
+    curl
+    wget
+    unzip
+    nvm
+    kubectl
+    helm
+    docker
+    dotnetcore
+    vscode
+  )
+
+  case "$py_profile" in
+    all) targets+=("python-full") ;;
+    ai) targets+=("python-ai") ;;
+    skip) ;;
+  esac
+
+  case "$go_profile" in
+    all) targets+=("go-full") ;;
+    ai) targets+=("go-ai") ;;
+    skip) ;;
+  esac
+
+  case "$node_profile" in
+    all|ai) targets+=("node-full") ;;
+    skip) ;;
+  esac
+
+  printf '%s\n' "${targets[*]}"
+}
+
+pick_package_set() {
+  local language="$1"
+  local input
+
+  read -r -u 3 -p "$language package set (all/ai) [all]: " input
+  input="${input:-all}"
+
+  if [[ "$input" == "all" || "$input" == "ai" ]]; then
+    printf '%s\n' "$input"
+    return
+  fi
+
+  echo "Unknown package set '$input' for $language. Using all." > /dev/tty
+  printf '%s\n' "all"
 }
 
 if [[ "$HAS_TTY" == true ]]; then
@@ -111,7 +218,7 @@ fi
 
 run_bash=false
 run_tools=false
-tools_target="${1:-default}"
+tools_target="${1:-full}"
 
 if confirm "Run bash helper install?" "y"; then
   run_bash=true

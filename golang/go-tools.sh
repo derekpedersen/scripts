@@ -23,13 +23,15 @@ source "$SCRIPT_DIR/packages.sh"
 GO_PACKAGE_PROFILE="${GO_PACKAGE_PROFILE:-full}"
 if [[ "$GO_PACKAGE_PROFILE" == "core" ]]; then
   GO_TOOLS=("${GO_CORE_PACKAGES[@]}")
+elif [[ "$GO_PACKAGE_PROFILE" == "ai" ]]; then
+  GO_TOOLS=("${GO_AI_PACKAGES[@]}")
 else
   GO_TOOLS=("${GO_FULL_PACKAGES[@]}")
 fi
 
 usage() {
   cat <<'EOF'
-Usage: bash golang/go-tools.sh [--list|--install|--dry-run|--help|--core|--full]
+Usage: bash golang/go-tools.sh [--list|--install|--dry-run|--help|--core|--full|--ai]
 
 Review and install Go tools from the repo's canonical manifest.
 
@@ -39,6 +41,7 @@ Options:
   --dry-run    Show what would be installed without installing it.
   --core       Use the smaller core Go tool profile.
   --full       Use the full Go tool profile.
+  --ai         Use the AI/agent Go tool profile.
   --help       Show this help text.
 
 The tool list is sourced from .tools/common.sh to avoid drift.
@@ -94,6 +97,11 @@ main() {
     --full)
       GO_PACKAGE_PROFILE="full"
       GO_TOOLS=("${GO_FULL_PACKAGES[@]}")
+      list_tools
+      ;;
+    --ai)
+      GO_PACKAGE_PROFILE="ai"
+      GO_TOOLS=("${GO_AI_PACKAGES[@]}")
       list_tools
       ;;
     --list)

@@ -125,29 +125,29 @@ TOOL_SHED_HELPERS_FILE=~/.my-helpers curl -fsSL https://raw.githubusercontent.co
 From this repo:
 
 ```bash
-bash ./.tools/install.sh default
+bash ./.tools/install.sh full
 ```
 
 Native Windows 11+ support is included. Use either Git Bash/MSYS, PowerShell with the bundled wrapper, or WSL/Linux paths as appropriate:
 
 ```powershell
-pwsh ./.tools/install.ps1 default
+pwsh ./.tools/install.ps1 full
 ```
 
 ```bash
-bash ./.tools/install.sh default
+bash ./.tools/install.sh full
 ```
 
-One-liner from GitHub (replace default with full, dev, services, cloud, or python-ai):
+One-liner from GitHub (replace full with ai or cloud):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- default
+curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- full
 ```
 
 Optional override for testing another branch or fork during bootstrap:
 
 ```bash
-TOOL_SHED_REF=feature/my-branch TOOL_SHED_REPO=derekpedersen/tool-shed curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- default
+TOOL_SHED_REF=feature/my-branch TOOL_SHED_REPO=derekpedersen/tool-shed curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- full
 ```
 
 ### Close the doors
@@ -161,15 +161,16 @@ This removes the managed source block from your shell profile and deletes the ge
 ### Pack up the tools
 
 ```bash
-bash ./.tools/uninstall.sh default
+bash ./.tools/uninstall.sh full
+bash ./.tools/uninstall.sh services
 bash ./.tools/uninstall.sh kubectl docker
-bash ./.tools/uninstall.sh services --dry-run
+bash ./.tools/uninstall.sh ai --dry-run
 ```
 
 Windows examples:
 
 ```powershell
-pwsh ./.tools/uninstall.ps1 default
+pwsh ./.tools/uninstall.ps1 full
 pwsh ./.tools/uninstall.ps1 docker vscode --dry-run
 ```
 
@@ -177,28 +178,30 @@ The uninstall flow mirrors the install pattern: it is explicit, target-based, an
 
 ## Tool bundles
 
-- default: core developer setup
-- full: default plus broader dev, cloud tooling, and local services
-- dev: alias of full
-- services: local data/service stack
-- cloud: cloud CLIs and JSON/YAML helpers
-- python-ai: Python AI/agent tooling stack with redis, rq, LangChain, OpenAI, Anthropic, and model tooling
+- full (default): base developer setup + cloud CLIs + local data/service tooling
+- cloud: base setup + kubernetes/docker/cloud CLIs and JSON/YAML helpers
+- services: local data/service tooling only (postgres, redis, mysql, clickhouse, mongodb, rabbitmq, elasticsearch, kafka)
+- ai: base setup + AI-oriented Python/Go packages and full Node package profile
+
+For language-by-language tool selection, run the guided root installer:
+
+```bash
+./install.sh
+```
 
 Bundle quick examples:
 
 ```bash
-bash ./.tools/install.sh default
 bash ./.tools/install.sh full
-bash ./.tools/install.sh dev
-bash ./.tools/install.sh services
 bash ./.tools/install.sh cloud
-bash ./.tools/install.sh python-ai
+bash ./.tools/install.sh services
+bash ./.tools/install.sh ai
 ```
 
 Dry run example:
 
 ```bash
-bash ./.tools/install.sh full --dry-run
+bash ./.tools/install.sh ai --dry-run
 ```
 
 Identity setup examples:
@@ -224,5 +227,5 @@ Build/test coverage includes:
 
 - syntax of files in [.bash](.bash)
 - syntax of files in [.tools](.tools)
-- installer smoke tests for default, services, and cloud bundles using dry-run mode
-- uninstaller smoke tests for default, services, and cloud bundles using dry-run mode
+- installer smoke tests for full, cloud, services, and ai bundles using dry-run mode
+- uninstaller smoke tests for full, cloud, services, and ai bundles using dry-run mode

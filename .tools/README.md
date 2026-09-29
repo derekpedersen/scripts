@@ -4,6 +4,13 @@ Installer/runtime layer for the repo's bundle-based tool installation flow.
 
 This folder contains the controller and platform logic that resolves bundles, dispatches module installers, and keeps the cross-platform behavior in one place. Individual tool packages continue to live as repo-root directories such as [docker](docker), [kubectl](kubectl), [aws](aws), [gcloud](gcloud), and [git](git).
 
+Canonical bundle names are defined in `common.sh` and intentionally limited to:
+
+- `full` (default)
+- `cloud`
+- `services`
+- `ai`
+
 ## Files
 
 - install.sh: central installer that resolves bundles and dispatches to module installers.

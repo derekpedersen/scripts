@@ -14,22 +14,6 @@ set -euo pipefail
 #   whenever adding or changing install options.
 # ============================================================
 
-DEFAULT_BUNDLE=(
-  git
-  curl
-  wget
-  unzip
-  python3
-  nvm
-  node
-  golang
-  kubectl
-  helm
-  docker
-  dotnetcore
-  vscode
-)
-
 FULL_BUNDLE=(
   git
   curl
@@ -44,7 +28,6 @@ FULL_BUNDLE=(
   docker
   dotnetcore
   vscode
-  code
   gcloud
   aws
   eksctl
@@ -58,6 +41,61 @@ FULL_BUNDLE=(
   clickhouse
   mongodb
   rabbitmq
+  elasticsearch
+  kafka
+)
+
+CLOUD_BUNDLE=(
+  git
+  curl
+  wget
+  unzip
+  python3
+  nvm
+  node
+  golang
+  kubectl
+  helm
+  docker
+  dotnetcore
+  vscode
+  gcloud
+  aws
+  eksctl
+  doctl
+  az
+  jq
+  yq
+)
+
+SERVICES_BUNDLE=(
+  postgres
+  redis
+  mysql
+  clickhouse
+  mongodb
+  rabbitmq
+  elasticsearch
+  kafka
+)
+
+AI_BUNDLE=(
+  git
+  curl
+  wget
+  unzip
+  python3
+  nvm
+  node
+  golang
+  kubectl
+  helm
+  docker
+  dotnetcore
+  vscode
+  python-ai
+  go-ai
+  node-full
 )
 
 COMMON_TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" && pwd)"
@@ -87,6 +125,8 @@ get_tool_package_list() {
       fi
       if [[ "$profile" == "core" ]]; then
         package_list=("${GO_CORE_PACKAGES[@]}")
+      elif [[ "$profile" == "ai" ]]; then
+        package_list=("${GO_AI_PACKAGES[@]}")
       else
         package_list=("${GO_FULL_PACKAGES[@]}")
       fi
@@ -515,27 +555,6 @@ configure_identity_interactive() {
   fi
 }
 
-SERVICES_BUNDLE=(
-  postgres
-  redis
-  mysql
-  clickhouse
-  mongodb
-  rabbitmq
-  elasticsearch
-  kafka
-)
-
-CLOUD_BUNDLE=(
-  gcloud
-  aws
-  eksctl
-  doctl
-  az
-  jq
-  yq
-)
-
 ensure_root_or_sudo() {
   if [[ "$(id -u)" -eq 0 ]]; then
     SUDO=""
@@ -591,6 +610,9 @@ canonical_tool_name() {
     python-full)
       echo "python3"
       ;;
+    python-ai)
+      echo "python3"
+      ;;
     python)
       echo "python3"
       ;;
@@ -598,6 +620,9 @@ canonical_tool_name() {
       echo "golang"
       ;;
     go-full)
+      echo "golang"
+      ;;
+    go-ai)
       echo "golang"
       ;;
     go|golang)
@@ -622,16 +647,19 @@ expand_bundle_item() {
   local item="$1"
 
   case "$item" in
-    default)
-      printf '%s\n' "${DEFAULT_BUNDLE[@]}"
-      ;;
-    full|dev)
+    full)
       printf '%s\n' "${FULL_BUNDLE[@]}"
+      ;;
+    ai)
+      printf '%s\n' "${AI_BUNDLE[@]}"
       ;;
     python-core)
       printf '%s\n' "python3"
       ;;
     python-full)
+      printf '%s\n' "python3"
+      ;;
+    python-ai)
       printf '%s\n' "python3"
       ;;
     python)
@@ -641,6 +669,9 @@ expand_bundle_item() {
       printf '%s\n' "golang"
       ;;
     go-full)
+      printf '%s\n' "golang"
+      ;;
+    go-ai)
       printf '%s\n' "golang"
       ;;
     go)
@@ -655,11 +686,11 @@ expand_bundle_item() {
     node)
       printf '%s\n' "node"
       ;;
-    services)
-      printf '%s\n' "${SERVICES_BUNDLE[@]}"
-      ;;
     cloud)
       printf '%s\n' "${CLOUD_BUNDLE[@]}"
+      ;;
+    services)
+      printf '%s\n' "${SERVICES_BUNDLE[@]}"
       ;;
     *)
       printf '%s\n' "$item"
