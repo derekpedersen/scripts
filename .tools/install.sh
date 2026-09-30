@@ -81,6 +81,16 @@ if [[ ${#args[@]} -eq 0 ]]; then
   echo "No install target provided. Defaulting to: full"
 fi
 
+LOG_FILE=""
+if [[ "$DRY_RUN" != true ]]; then
+  LOG_DIR="${TOOL_SHED_LOG_DIR:-$HOME/.tool-shed/logs}"
+  mkdir -p "$LOG_DIR"
+  LOG_FILE="$LOG_DIR/install-$(date +%Y%m%d-%H%M%S).log"
+  exec > >(tee -a "$LOG_FILE") 2>&1
+  echo "Logging install output to $LOG_FILE"
+  echo "Targets: ${args[*]}"
+fi
+
 for arg in "${args[@]}"; do
   case "$arg" in
     default|dev|ai-tools)
@@ -179,6 +189,7 @@ done
 
 if (( failures > 0 )); then
   echo "Install finished with $failures failure(s)."
+  [[ -n "$LOG_FILE" ]] && echo "Full log: $LOG_FILE"
   exit 1
 fi
 
@@ -186,4 +197,5 @@ if [[ "$DRY_RUN" == true ]]; then
   echo "Dry run complete for: ${TARGET_LIST[*]}"
 else
   echo "Install complete for: ${TARGET_LIST[*]}"
+  echo "Full log: $LOG_FILE"
 fi

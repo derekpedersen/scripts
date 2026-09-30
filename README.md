@@ -150,6 +150,8 @@ Optional override for testing another branch or fork during bootstrap:
 TOOL_SHED_REF=feature/my-branch TOOL_SHED_REPO=derekpedersen/tool-shed curl -fsSL https://raw.githubusercontent.com/derekpedersen/tool-shed/main/.tools/install.sh | bash -s -- full
 ```
 
+Install output is also written to `~/.tool-shed/logs/install-<timestamp>.log` (override with `TOOL_SHED_LOG_DIR`). Dry runs are not logged.
+
 ### Close the doors
 
 ```bash

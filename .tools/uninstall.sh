@@ -486,6 +486,19 @@ uninstall_tool() {
         uninstall_windows "$tool"
       else
         remove_apt_package "mongodb-org" "mongod"
+        local mongodb_file
+        for mongodb_file in \
+          /etc/apt/sources.list.d/mongodb-org-7.0.list \
+          /etc/apt/sources.list.d/mongodb-org-8.0.list \
+          /usr/share/keyrings/mongodb-server-7.0.gpg \
+          /usr/share/keyrings/mongodb-server-8.0.gpg; do
+          [[ -f "$mongodb_file" ]] || continue
+          if [[ "$DRY_RUN" == true ]]; then
+            echo "DRY RUN: sudo rm -f $mongodb_file"
+          else
+            sudo rm -f "$mongodb_file"
+          fi
+        done
       fi
       ;;
     rabbitmq)

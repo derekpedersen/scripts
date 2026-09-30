@@ -176,9 +176,27 @@ install_python_dev_packages() {
     return 0
   fi
 
-  echo "Installing Python developer packages via pip ($package_profile profile)..."
-  "$python_cmd" -m pip install --user --upgrade pip setuptools wheel
-  "$python_cmd" -m pip install --user "${package_list[@]}"
+  local venv_dir="$HOME/.local/share/tool-shed/python-venv"
+  local venv_python="$venv_dir/bin/python"
+  local venv_bin="$venv_dir/bin"
+  local shell_profile="$HOME/.bashrc"
+  case "${TOOL_SHED_OS_OVERRIDE:-$(uname -s)}" in
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+      venv_python="$venv_dir/Scripts/python.exe"
+      venv_bin="$venv_dir/Scripts"
+      ;;
+  esac
+
+  echo "Installing Python developer packages in $venv_dir ($package_profile profile)..."
+  if [[ ! -x "$venv_python" ]]; then
+    "$python_cmd" -m venv "$venv_dir"
+  fi
+  "$venv_python" -m pip install --upgrade pip setuptools wheel
+  "$venv_python" -m pip install "${package_list[@]}"
+
+  if ! grep -Fq "$venv_bin" "$shell_profile" 2>/dev/null; then
+    printf '\n# Tool-shed Python developer tools\nexport PATH="%s:$PATH"\n' "$venv_bin" >> "$shell_profile"
+  fi
 }
 
 install_go_dev_packages() {
@@ -206,7 +224,9 @@ install_go_dev_packages() {
 
   echo "Installing Go developer packages via go install ($package_profile profile)..."
   export PATH="$PATH:$HOME/go/bin"
-  "$go_cmd" install "${package_list[@]}"
+  for pkg in "${package_list[@]}"; do
+    "$go_cmd" install "$pkg"
+  done
 }
 
 install_node_dev_packages() {
@@ -234,6 +254,21 @@ install_node_dev_packages() {
 
   echo "Installing Node developer packages via npm ($package_profile profile)..."
   npm install --global "${package_list[@]}"
+}
+
+configure_git_editor() {
+  if ! command -v git >/dev/null 2>&1 || ! command -v vim >/dev/null 2>&1; then
+    return 0
+  fi
+
+  local current_editor
+  current_editor="$(git config --global --get core.editor || true)"
+  if [[ -z "$current_editor" ]]; then
+    git config --global core.editor vim
+    echo "Git default editor set to vim."
+  elif [[ "$current_editor" != "vim" ]]; then
+    echo "Git core.editor already set to '$current_editor'; leaving it unchanged."
+  fi
 }
 
 configure_git_identity() {

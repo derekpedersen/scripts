@@ -54,6 +54,8 @@ install_mac() {
       git)
         install_brew_formula_if_missing "git"
         install_brew_formula_if_missing "bash-completion"
+        install_brew_formula_if_missing "vim"
+        configure_git_editor
         configure_git_completion
         ;;
       gpg)
@@ -107,11 +109,14 @@ install_mac() {
         fi
         export NVM_DIR="$HOME/.nvm"
         if [ -s "$NVM_DIR/nvm.sh" ]; then
+          # nvm.sh exits non-zero under set -eu
+          set +eu
           . "$NVM_DIR/nvm.sh"
           if ! command -v node >/dev/null 2>&1; then
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
+          set -eu
         fi
         ;;
       node)
@@ -121,12 +126,15 @@ install_mac() {
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
         fi
         if [ -s "$NVM_DIR/nvm.sh" ]; then
+          # nvm.sh exits non-zero under set -eu
+          set +eu
           . "$NVM_DIR/nvm.sh"
           if ! command -v node >/dev/null 2>&1; then
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
           export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version default 2>/dev/null || echo "$(nvm ls --no-colors default 2>/dev/null | tail -n 1 | awk '{print $1}' | tr -d 'v')")/bin"
+          set -eu
         fi
         install_node_dev_packages "node"
         ;;

@@ -17,6 +17,10 @@ install_apt_pkg_if_missing() {
   fi
 }
 
+linux_ubuntu_codename() {
+  printf '%s\n' "${UBUNTU_CODENAME:-${VERSION_CODENAME:-}}"
+}
+
 install_linux() {
   LINUX_SKIPPED_COUNT=0
   echo "Detected Linux"
@@ -39,9 +43,17 @@ install_linux() {
   sudo -n true >/dev/null 2>&1 || echo "sudo not available or no password; continuing if already root."
 
   if command -v sudo >/dev/null 2>&1; then
-    SUDO="sudo"
+    # sudo resets the environment, so pass noninteractive explicitly to avoid hung debconf prompts
+    SUDO="sudo env DEBIAN_FRONTEND=noninteractive"
   else
     SUDO=""
+  fi
+
+  # MongoDB 7.0 only publishes focal/jammy; a stale 7.0 source 404s and breaks apt-get update.
+  local legacy_mongodb_repo="/etc/apt/sources.list.d/mongodb-org-7.0.list"
+  if [[ -f "$legacy_mongodb_repo" ]] && ! grep -Eq "repo.mongodb.org/apt/ubuntu (focal|jammy)/" "$legacy_mongodb_repo"; then
+    echo "Removing unsupported MongoDB 7.0 apt source: $legacy_mongodb_repo"
+    $SUDO rm -f "$legacy_mongodb_repo"
   fi
 
   if [[ -n "${SUDO}" ]]; then
@@ -55,6 +67,8 @@ install_linux() {
       git)
         install_apt_pkg_if_missing "git" "git"
         install_apt_pkg_if_missing "bash-completion" "bash"
+        install_apt_pkg_if_missing "vim" "vim"
+        configure_git_editor
         configure_git_completion
         ;;
       gpg)
@@ -106,11 +120,14 @@ install_linux() {
         fi
         export NVM_DIR="$HOME/.nvm"
         if [ -s "$NVM_DIR/nvm.sh" ]; then
+          # nvm.sh exits non-zero under set -eu
+          set +eu
           . "$NVM_DIR/nvm.sh"
           if ! command -v node >/dev/null 2>&1; then
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
+          set -eu
         fi
         ;;
       node)
@@ -120,12 +137,15 @@ install_linux() {
           curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
         fi
         if [ -s "$NVM_DIR/nvm.sh" ]; then
+          # nvm.sh exits non-zero under set -eu
+          set +eu
           . "$NVM_DIR/nvm.sh"
           if ! command -v node >/dev/null 2>&1; then
             nvm install --lts
           fi
           nvm alias default lts/* >/dev/null 2>&1 || true
           export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version default 2>/dev/null || echo "$(nvm ls --no-colors default 2>/dev/null | tail -n 1 | awk '{print $1}' | tr -d 'v')")/bin"
+          set -eu
         fi
         install_node_dev_packages "node"
         ;;
@@ -180,7 +200,7 @@ install_linux() {
         if ! command -v docker >/dev/null 2>&1; then
           if [[ -n "${SUDO}" ]]; then
             $SUDO install -m 0755 -d /etc/apt/keyrings
-            curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | $SUDO gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | $SUDO gpg --dearmor --yes -o /etc/apt/keyrings/docker.gpg
             $SUDO chmod a+r /etc/apt/keyrings/docker.gpg
             echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(. /etc/os-release; echo "$VERSION_CODENAME") stable" | $SUDO tee /etc/apt/sources.list.d/docker.list > /dev/null
             $SUDO apt-get update
@@ -197,7 +217,7 @@ install_linux() {
           install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
           install_apt_pkg_if_missing "gnupg" "gpg"
           install_apt_pkg_if_missing "curl" "curl"
-          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/cloud.google.gpg
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | $SUDO tee /etc/apt/sources.list.d/google-cloud-sdk.list >/dev/null
           $SUDO apt-get update
           $SUDO apt-get install -y google-cloud-cli
@@ -245,7 +265,24 @@ install_linux() {
       python3)
         install_apt_pkg_if_missing "python3" "python3"
         install_apt_pkg_if_missing "python3-pip" "pip3"
+        install_apt_pkg_if_missing "python3-venv" "python3-venv"
         install_python_dev_packages "python3"
+        ;;
+      jq)
+        install_apt_pkg_if_missing "jq" "jq"
+        ;;
+      yq)
+        local yq_arch
+        case "$(uname -m)" in
+          x86_64) yq_arch="amd64" ;;
+          aarch64) yq_arch="arm64" ;;
+          armv7l) yq_arch="arm" ;;
+          *) echo "Unsupported yq architecture: $(uname -m)" >&2; return 1 ;;
+        esac
+        if ! command -v yq >/dev/null 2>&1; then
+          curl -fsSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${yq_arch}" -o /tmp/yq
+          $SUDO install -m 0755 /tmp/yq /usr/local/bin/yq
+        fi
         ;;
       postgres)
         install_apt_pkg_if_missing "postgresql" "pg_ctl"
@@ -271,7 +308,10 @@ install_linux() {
         install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
         install_apt_pkg_if_missing "gnupg" "gpg"
         if ! command -v clickhouse-server >/dev/null 2>&1; then
-          echo "deb https://packages.clickhouse.com/deb stable main" | $SUDO tee /etc/apt/sources.list.d/clickhouse.list >/dev/null
+          echo "Installing ClickHouse packages."
+          echo "If prompted for the default user password, input is hidden."
+          echo "Press Enter to keep an empty password, then press Enter again to confirm."
+          echo "deb [arch=$(dpkg --print-architecture)] https://packages.clickhouse.com/deb stable main" | $SUDO tee /etc/apt/sources.list.d/clickhouse.list >/dev/null
           curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | gpg --dearmor | $SUDO tee /etc/apt/trusted.gpg.d/clickhouse.gpg >/dev/null
           $SUDO apt-get update
           $SUDO apt-get install -y clickhouse-server clickhouse-client
@@ -282,8 +322,8 @@ install_linux() {
         install_apt_pkg_if_missing "gnupg" "gpg"
         install_apt_pkg_if_missing "curl" "curl"
         if ! command -v mongod >/dev/null 2>&1; then
-          curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | $SUDO gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
-          echo "deb [ arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(. /etc/os-release; echo "$VERSION_CODENAME")/mongodb-org/7.0 multiverse" | $SUDO tee /etc/apt/sources.list.d/mongodb-org-7.0.list >/dev/null
+          curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/mongodb-server-8.0.gpg
+          echo "deb [ arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(linux_ubuntu_codename)/mongodb-org/8.0 multiverse" | $SUDO tee /etc/apt/sources.list.d/mongodb-org-8.0.list >/dev/null
           $SUDO apt-get update
           $SUDO apt-get install -y mongodb-org
         fi
@@ -293,8 +333,8 @@ install_linux() {
         install_apt_pkg_if_missing "curl" "curl"
         install_apt_pkg_if_missing "gnupg" "gpg"
         if ! command -v rabbitmq-server >/dev/null 2>&1; then
-          curl -fsSL https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | $SUDO gpg --dearmor -o /usr/share/keyrings/rabbitmq.gpg
-          echo "deb [signed-by=/usr/share/keyrings/rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ $(. /etc/os-release; echo "$VERSION_CODENAME") main" | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
+          curl -fsSL https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/rabbitmq.gpg
+          echo "deb [signed-by=/usr/share/keyrings/rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ $(linux_ubuntu_codename) main" | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
           $SUDO apt-get update
           $SUDO apt-get install -y rabbitmq-server
         fi
@@ -304,7 +344,7 @@ install_linux() {
         install_apt_pkg_if_missing "gnupg" "gpg"
         install_apt_pkg_if_missing "curl" "curl"
         if ! command -v elasticsearch >/dev/null 2>&1; then
-          wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | $SUDO gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+          wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/elasticsearch-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | $SUDO tee /etc/apt/sources.list.d/elastic-8.x.list >/dev/null
           $SUDO apt-get update
           $SUDO apt-get install -y elasticsearch
