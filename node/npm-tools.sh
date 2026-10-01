@@ -80,6 +80,11 @@ dry_run() {
 install_tools() {
   check_node || return 1
 
+  local npm_prefix="${NPM_CONFIG_PREFIX:-$HOME/.local/share/tool-shed/node-global}"
+  mkdir -p "$npm_prefix"
+  export NPM_CONFIG_PREFIX="$npm_prefix"
+  export PATH="$npm_prefix/bin:$PATH"
+
   echo "Installing Node tools..."
   for tool in "${NODE_TOOLS[@]}"; do
     echo "Installing: $tool"

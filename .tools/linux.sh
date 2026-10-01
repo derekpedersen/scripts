@@ -123,9 +123,8 @@ install_linux() {
           # nvm.sh exits non-zero under set -eu
           set +eu
           . "$NVM_DIR/nvm.sh"
-          if ! command -v node >/dev/null 2>&1; then
-            nvm install --lts
-          fi
+          nvm install --lts
+          nvm use --lts
           nvm alias default lts/* >/dev/null 2>&1 || true
           set -eu
         fi
@@ -140,9 +139,8 @@ install_linux() {
           # nvm.sh exits non-zero under set -eu
           set +eu
           . "$NVM_DIR/nvm.sh"
-          if ! command -v node >/dev/null 2>&1; then
-            nvm install --lts
-          fi
+          nvm install --lts
+          nvm use --lts
           nvm alias default lts/* >/dev/null 2>&1 || true
           export PATH="$PATH:$HOME/.nvm/versions/node/$(nvm version default 2>/dev/null || echo "$(nvm ls --no-colors default 2>/dev/null | tail -n 1 | awk '{print $1}' | tr -d 'v')")/bin"
           set -eu
@@ -228,7 +226,16 @@ install_linux() {
         if ! command -v aws >/dev/null 2>&1; then
           install_apt_pkg_if_missing "unzip" "unzip"
           install_apt_pkg_if_missing "curl" "curl"
-          $SUDO apt-get install -y awscli
+          local aws_arch
+          case "$(dpkg --print-architecture)" in
+            amd64) aws_arch="x86_64" ;;
+            arm64) aws_arch="aarch64" ;;
+            *) echo "Unsupported AWS CLI architecture: $(dpkg --print-architecture)" >&2; return 1 ;;
+          esac
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${aws_arch}.zip" -o /tmp/awscliv2.zip
+          mkdir -p /tmp/awscli-installer
+          unzip -q -o /tmp/awscliv2.zip -d /tmp/awscli-installer
+          $SUDO /tmp/awscli-installer/aws/install --update
         fi
         configure_aws_completion
         ;;
@@ -333,8 +340,28 @@ install_linux() {
         install_apt_pkg_if_missing "curl" "curl"
         install_apt_pkg_if_missing "gnupg" "gpg"
         if ! command -v rabbitmq-server >/dev/null 2>&1; then
-          curl -fsSL https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/rabbitmq.gpg
-          echo "deb [signed-by=/usr/share/keyrings/rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ $(linux_ubuntu_codename) main" | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
+          local rabbitmq_arch rabbitmq_codename
+          rabbitmq_arch="$(dpkg --print-architecture)"
+          rabbitmq_codename="$(linux_ubuntu_codename)"
+          curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/rabbitmq.gpg
+          if [[ "$rabbitmq_arch" == "amd64" ]]; then
+            {
+              printf 'deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.gpg] https://deb1.rabbitmq.com/rabbitmq-erlang/ubuntu/%s %s main\n' "$rabbitmq_codename" "$rabbitmq_codename"
+              printf 'deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.gpg] https://deb2.rabbitmq.com/rabbitmq-erlang/ubuntu/%s %s main\n' "$rabbitmq_codename" "$rabbitmq_codename"
+              printf 'deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.gpg] https://deb1.rabbitmq.com/rabbitmq-server/ubuntu/%s %s main\n' "$rabbitmq_codename" "$rabbitmq_codename"
+              printf 'deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.gpg] https://deb2.rabbitmq.com/rabbitmq-server/ubuntu/%s %s main\n' "$rabbitmq_codename" "$rabbitmq_codename"
+            } | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
+          elif [[ "$rabbitmq_arch" == "arm64" ]]; then
+            curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf77f1eda57ebb1cc' | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/rabbitmq-erlang.gpg
+            {
+              printf 'deb [arch=arm64 signed-by=/usr/share/keyrings/rabbitmq-erlang.gpg] http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu %s main\n' "$rabbitmq_codename"
+              printf 'deb [arch=arm64 signed-by=/usr/share/keyrings/rabbitmq.gpg] https://deb1.rabbitmq.com/rabbitmq-server/ubuntu/%s %s main\n' "$rabbitmq_codename" "$rabbitmq_codename"
+              printf 'deb [arch=arm64 signed-by=/usr/share/keyrings/rabbitmq.gpg] https://deb2.rabbitmq.com/rabbitmq-server/ubuntu/%s %s main\n' "$rabbitmq_codename" "$rabbitmq_codename"
+            } | $SUDO tee /etc/apt/sources.list.d/rabbitmq.list >/dev/null
+          else
+            echo "Unsupported RabbitMQ architecture: $rabbitmq_arch" >&2
+            return 1
+          fi
           $SUDO apt-get update
           $SUDO apt-get install -y rabbitmq-server
         fi
@@ -356,9 +383,9 @@ install_linux() {
         install_apt_pkg_if_missing "ca-certificates" "ca-certificates"
         if ! command -v kafka-server-start >/dev/null 2>&1; then
           $SUDO apt-get install -y openjdk-17-jre-headless
-          curl -fsSL https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz -o /tmp/kafka.tgz
-          mkdir -p /opt/kafka
-          tar -xzf /tmp/kafka.tgz -C /opt/kafka --strip-components=1
+          curl -fsSL https://archive.apache.org/dist/kafka/3.7.0/kafka_2.13-3.7.0.tgz -o /tmp/kafka.tgz
+          $SUDO install -d /opt/kafka
+          $SUDO tar -xzf /tmp/kafka.tgz -C /opt/kafka --strip-components=1
           echo "Kafka downloaded to /opt/kafka. Start it with: /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties"
         fi
         ;;

@@ -253,6 +253,10 @@ install_node_dev_packages() {
   fi
 
   echo "Installing Node developer packages via npm ($package_profile profile)..."
+  local npm_prefix="${NPM_CONFIG_PREFIX:-$HOME/.local/share/tool-shed/node-global}"
+  mkdir -p "$npm_prefix"
+  export NPM_CONFIG_PREFIX="$npm_prefix"
+  export PATH="$npm_prefix/bin:$PATH"
   npm install --global "${package_list[@]}"
 }
 
